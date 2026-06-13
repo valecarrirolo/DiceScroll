@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -48,6 +47,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+enum class MainTab {
+    Roller,
+    History
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -57,7 +61,7 @@ fun MainScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val haptic = LocalHapticFeedback.current
-    var showHistorySheet by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableStateOf(MainTab.Roller) }
 
     // Trigger haptic feedback when rolling state changes
     LaunchedEffect(state.isRolling) {
@@ -70,8 +74,11 @@ fun MainScreen(
 
     MainScreenContent(
         state = state,
+        selectedTab = selectedTab,
+        onTabSelected = { selectedTab = it },
         onClearTray = { viewModel.clearTray() },
-        onShowHistory = { showHistorySheet = true },
+        onShowHistory = { selectedTab = MainTab.History },
+        onClearHistory = { viewModel.clearHistory() },
         onSetModifier = { viewModel.setModifier(it) },
         onRoll = { viewModel.rollTray() },
         onAddDie = { viewModel.addDie(it) },
@@ -79,20 +86,6 @@ fun MainScreen(
         modifier = modifier
     )
 
-    // Modal Bottom Sheet for History
-    if (showHistorySheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showHistorySheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.background
-        ) {
-            HistorySheetContent(
-                state = state,
-                onClearHistory = { viewModel.clearHistory() },
-                onDismiss = { showHistorySheet = false }
-            )
-        }
-    }
 }
 
 @Composable
@@ -111,6 +104,9 @@ fun MainScreenContent(
     onRoll: () -> Unit,
     onAddDie: (DiceType) -> Unit,
     onRemoveDie: (DiceType) -> Unit,
+    selectedTab: MainTab = MainTab.Roller,
+    onTabSelected: (MainTab) -> Unit = {},
+    onClearHistory: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var recentlyAddedDie by remember { mutableStateOf<DiceType?>(null) }
@@ -158,16 +154,32 @@ fun MainScreenContent(
                     containerColor = Color.Transparent
                 )
             )
+        },
+        bottomBar = {
+            DiceScrollBottomBar(
+                selectedTab = selectedTab,
+                onTabSelected = onTabSelected
+            )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        if (selectedTab == MainTab.History) {
+            HistoryTabContent(
+                state = state,
+                onClearHistory = onClearHistory,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             // 1. TRAY AREA: Displays selected dice and their roll values
             Box(
                 modifier = Modifier
@@ -335,6 +347,38 @@ fun MainScreenContent(
                 }
             }
         }
+    }
+    }
+}
+
+@Composable
+fun DiceScrollBottomBar(
+    selectedTab: MainTab,
+    onTabSelected: (MainTab) -> Unit
+) {
+    NavigationBar {
+        NavigationBarItem(
+            selected = selectedTab == MainTab.Roller,
+            onClick = { onTabSelected(MainTab.Roller) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Roller"
+                )
+            },
+            label = { Text("Roller") }
+        )
+        NavigationBarItem(
+            selected = selectedTab == MainTab.History,
+            onClick = { onTabSelected(MainTab.History) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = "History"
+                )
+            },
+            label = { Text("History") }
+        )
     }
 }
 
@@ -707,17 +751,16 @@ fun DiceSelectionCard(
 }
 
 @Composable
-fun HistorySheetContent(
+fun HistoryTabContent(
     state: DiceUiState,
     onClearHistory: () -> Unit,
-    onDismiss: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.7f)
             .padding(16.dp)
     ) {
         Row(
@@ -766,15 +809,6 @@ fun HistorySheetContent(
                     HistoryItem(roll = roll, dateFormat = dateFormat)
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Close")
         }
     }
 }

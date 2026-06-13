@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +37,7 @@ import androidx.navigation3.runtime.NavKey
 import com.github.valecarrirolo.dicescroll.data.DefaultDataRepository
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
+import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
 import com.github.valecarrirolo.dicescroll.theme.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -62,6 +64,45 @@ fun MainScreen(
         }
     }
 
+    MainScreenContent(
+        state = state,
+        onClearTray = { viewModel.clearTray() },
+        onShowHistory = { showHistorySheet = true },
+        onSetModifier = { viewModel.setModifier(it) },
+        onRoll = { viewModel.rollTray() },
+        onAddDie = { viewModel.addDie(it) },
+        onRemoveDie = { viewModel.removeDie(it) },
+        modifier = modifier
+    )
+
+    // Modal Bottom Sheet for History
+    if (showHistorySheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showHistorySheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.background
+        ) {
+            HistorySheetContent(
+                state = state,
+                onClearHistory = { viewModel.clearHistory() },
+                onDismiss = { showHistorySheet = false }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreenContent(
+    state: DiceUiState,
+    onClearTray: () -> Unit,
+    onShowHistory: () -> Unit,
+    onSetModifier: (Int) -> Unit,
+    onRoll: () -> Unit,
+    onAddDie: (DiceType) -> Unit,
+    onRemoveDie: (DiceType) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -76,14 +117,14 @@ fun MainScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.clearTray() }) {
+                    IconButton(onClick = onClearTray) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Clear Tray",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    IconButton(onClick = { showHistorySheet = true }) {
+                    IconButton(onClick = onShowHistory) {
                         Icon(
                             imageVector = Icons.Default.List,
                             contentDescription = "View History",
@@ -182,7 +223,7 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IconButton(
-                        onClick = { viewModel.setModifier(state.modifier - 1) },
+                        onClick = { onSetModifier(state.modifier - 1) },
                         modifier = Modifier
                             .size(36.dp)
                             .background(
@@ -198,7 +239,7 @@ fun MainScreen(
                     }
 
                     IconButton(
-                        onClick = { viewModel.setModifier(state.modifier + 1) },
+                        onClick = { onSetModifier(state.modifier + 1) },
                         modifier = Modifier
                             .size(36.dp)
                             .background(
@@ -227,7 +268,7 @@ fun MainScreen(
                         buttonScale.animateTo(0.92f, animationSpec = tween(100))
                         buttonScale.animateTo(1f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy))
                     }
-                    viewModel.rollTray()
+                    onRoll()
                 },
                 enabled = state.selectedDice.isNotEmpty() && !state.isRolling,
                 modifier = Modifier
@@ -295,26 +336,11 @@ fun MainScreen(
                     DiceSelectionCard(
                         type = type,
                         count = count,
-                        onAdd = { viewModel.addDie(type) },
-                        onRemove = { viewModel.removeDie(type) }
+                        onAdd = { onAddDie(type) },
+                        onRemove = { onRemoveDie(type) }
                     )
                 }
             }
-        }
-    }
-
-    // Modal Bottom Sheet for History
-    if (showHistorySheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showHistorySheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.background
-        ) {
-            HistorySheetContent(
-                state = state,
-                onClearHistory = { viewModel.clearHistory() },
-                onDismiss = { showHistorySheet = false }
-            )
         }
     }
 }
@@ -400,7 +426,6 @@ fun TrayContent(state: DiceUiState) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Chunk the list into rows of up to 4 dice
                 val chunks = itemsToDisplay.chunked(4)
                 items(chunks) { rowItems ->
                     Row(
@@ -526,7 +551,6 @@ fun DiceSelectionCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Die Display Icon/Circle
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -545,7 +569,6 @@ fun DiceSelectionCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Counter Label
             Text(
                 text = if (count > 0) "$count selected" else "Tap to add",
                 fontSize = 10.sp,
@@ -557,7 +580,6 @@ fun DiceSelectionCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Plus/Minus Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -678,7 +700,6 @@ fun HistorySheetContent(
 @Composable
 fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
     val timeStr = remember(roll.timestamp) { dateFormat.format(Date(roll.timestamp)) }
-    // Calculate a summary string like "2D6, 1D20 (+2)"
     val diceSummary = remember(roll.rolls) {
         roll.rolls.groupBy { it.diceType }
             .map { (type, list) -> "${list.size}${type.displayName}" }
@@ -720,7 +741,6 @@ fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Detail rolls list: [4, 6] [12]
                 val rollsDetail = remember(roll.rolls) {
                     roll.rolls.map { it.value }.joinToString(", ")
                 }
@@ -748,6 +768,129 @@ fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                 )
             }
+        }
+    }
+}
+
+// ================= PREVIEWS =================
+
+@Preview(showBackground = true, name = "Main Screen Light")
+@Composable
+fun MainScreenContentLightPreview() {
+    DiceScrollTheme(darkTheme = false) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            MainScreenContent(
+                state = DiceUiState(
+                    selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1),
+                    modifier = 2
+                ),
+                onClearTray = {},
+                onShowHistory = {},
+                onSetModifier = {},
+                onRoll = {},
+                onAddDie = {},
+                onRemoveDie = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Main Screen Dark")
+@Composable
+fun MainScreenContentDarkPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            MainScreenContent(
+                state = DiceUiState(
+                    selectedDice = mapOf(DiceType.D4 to 1, DiceType.D12 to 1, DiceType.D100 to 1),
+                    modifier = -1
+                ),
+                onClearTray = {},
+                onShowHistory = {},
+                onSetModifier = {},
+                onRoll = {},
+                onAddDie = {},
+                onRemoveDie = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Tray Empty")
+@Composable
+fun TrayContentEmptyPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).fillMaxWidth()) {
+            MainScreenContent(
+                state = DiceUiState(selectedDice = emptyMap()),
+                onClearTray = {},
+                onShowHistory = {},
+                onSetModifier = {},
+                onRoll = {},
+                onAddDie = {},
+                onRemoveDie = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Tray Rolling")
+@Composable
+fun TrayContentRollingPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            MainScreenContent(
+                state = DiceUiState(
+                    selectedDice = mapOf(DiceType.D6 to 2),
+                    isRolling = true,
+                    animatedValues = listOf(3, 5)
+                ),
+                onClearTray = {},
+                onShowHistory = {},
+                onSetModifier = {},
+                onRoll = {},
+                onAddDie = {},
+                onRemoveDie = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Die Item D20")
+@Composable
+fun DieItemPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.padding(16.dp)) {
+            DieItem(type = DiceType.D20, value = 18, isRolling = false)
+        }
+    }
+}
+
+@Preview(name = "Dice Selection Card")
+@Composable
+fun DiceSelectionCardPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.padding(16.dp)) {
+            DiceSelectionCard(type = DiceType.D8, count = 2, onAdd = {}, onRemove = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "History Item")
+@Composable
+fun HistoryItemPreview() {
+    DiceScrollTheme(darkTheme = true) {
+        Box(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.background)) {
+            HistoryItem(
+                roll = RollResult(
+                    rolls = listOf(
+                        SingleDieRoll(diceType = DiceType.D6, value = 4),
+                        SingleDieRoll(diceType = DiceType.D20, value = 15)
+                    ),
+                    modifier = 2
+                ),
+                dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            )
         }
     }
 }

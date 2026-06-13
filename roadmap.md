@@ -58,7 +58,7 @@ Tasks:
 
 * [x] Introduce Room as the local persistence layer.
 * [x] Persist roll history.
-* [ ] Persist and restore the current tray state.
+* [x] Persist and restore the current tray state.
 * [ ] Replace the history bottom sheet with a dedicated bottom navigation tab.
 * [ ] Show full local date and time for each roll.
 * [ ] Store roll history as immutable snapshots of the dice definitions used at roll time.

@@ -36,6 +36,19 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
     private val _currentRollResult = MutableStateFlow<RollResult?>(null)
     private val _animatedValues = MutableStateFlow<List<Int>>(emptyList())
 
+    init {
+        viewModelScope.launch {
+            repository.selectedDice.collect { selectedDice ->
+                _selectedDice.value = selectedDice
+            }
+        }
+        viewModelScope.launch {
+            repository.modifier.collect { modifier ->
+                _modifier.value = modifier
+            }
+        }
+    }
+
     val uiState: StateFlow<DiceUiState> = combine(
         _selectedDice,
         _modifier,
@@ -61,31 +74,36 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
 
     fun addDie(diceType: DiceType) {
         if (_isRolling.value) return
-        _selectedDice.value = _selectedDice.value.toMutableMap().apply {
+        val updatedDice = _selectedDice.value.toMutableMap().apply {
             put(diceType, (get(diceType) ?: 0) + 1)
         }
+        setSelectedDice(updatedDice)
     }
 
     fun removeDie(diceType: DiceType) {
         if (_isRolling.value) return
         val currentCount = _selectedDice.value[diceType] ?: return
-        _selectedDice.value = _selectedDice.value.toMutableMap().apply {
+        val updatedDice = _selectedDice.value.toMutableMap().apply {
             if (currentCount <= 1) {
                 remove(diceType)
             } else {
                 put(diceType, currentCount - 1)
             }
         }
+        setSelectedDice(updatedDice)
     }
 
     fun setModifier(value: Int) {
         if (_isRolling.value) return
         _modifier.value = value
+        viewModelScope.launch {
+            repository.setModifier(value)
+        }
     }
 
     fun clearTray() {
         if (_isRolling.value) return
-        _selectedDice.value = emptyMap()
+        setSelectedDice(emptyMap())
         _currentRollResult.value = null
         _animatedValues.value = emptyList()
     }
@@ -130,6 +148,13 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
     fun clearHistory() {
         viewModelScope.launch {
             repository.clearHistory()
+        }
+    }
+
+    private fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
+        _selectedDice.value = selectedDice
+        viewModelScope.launch {
+            repository.setSelectedDice(selectedDice)
         }
     }
 }

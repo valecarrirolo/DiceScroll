@@ -7,6 +7,8 @@ import com.github.valecarrirolo.dicescroll.data.local.DiceScrollDatabase
 import com.github.valecarrirolo.dicescroll.data.local.RollResultEntity
 import com.github.valecarrirolo.dicescroll.data.local.RollResultWithDice
 import com.github.valecarrirolo.dicescroll.data.local.SingleDieRollEntity
+import com.github.valecarrirolo.dicescroll.data.local.AppStateEntity
+import com.github.valecarrirolo.dicescroll.data.local.TrayDieEntity
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
@@ -20,8 +22,12 @@ import kotlinx.coroutines.withContext
 
 interface DataRepository {
     val rollHistory: Flow<List<RollResult>>
+    val selectedDice: Flow<Map<DiceType, Int>>
+    val modifier: Flow<Int>
     suspend fun addRoll(roll: RollResult)
     suspend fun clearHistory()
+    suspend fun setSelectedDice(selectedDice: Map<DiceType, Int>)
+    suspend fun setModifier(modifier: Int)
 }
 
 class DefaultDataRepository(context: Context) : DataRepository {
@@ -34,6 +40,10 @@ class DefaultDataRepository(context: Context) : DataRepository {
 
     override val rollHistory: Flow<List<RollResult>> = dao.observeRollHistory()
         .map { entries -> entries.map { it.toDomain() } }
+    override val selectedDice: Flow<Map<DiceType, Int>> = dao.observeTrayDice()
+        .map { dice -> dice.toDomainMap() }
+    override val modifier: Flow<Int> = dao.observeModifier()
+        .map { it ?: 0 }
 
     override suspend fun addRoll(roll: RollResult) {
         withContext(Dispatchers.IO) {
@@ -51,11 +61,30 @@ class DefaultDataRepository(context: Context) : DataRepository {
             dao.clearRollHistory()
         }
     }
+
+    override suspend fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
+        withContext(Dispatchers.IO) {
+            database.withTransaction {
+                dao.clearTrayDice()
+                dao.setTrayDice(selectedDice.toTrayEntities())
+            }
+        }
+    }
+
+    override suspend fun setModifier(modifier: Int) {
+        withContext(Dispatchers.IO) {
+            dao.setModifier(AppStateEntity(0, modifier))
+        }
+    }
 }
 
 class InMemoryDataRepository : DataRepository {
     private val _rollHistory = MutableStateFlow<List<RollResult>>(emptyList())
+    private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(mapOf(DiceType.D6 to 1))
+    private val _modifier = MutableStateFlow(0)
     override val rollHistory: Flow<List<RollResult>> = _rollHistory.asStateFlow()
+    override val selectedDice: Flow<Map<DiceType, Int>> = _selectedDice.asStateFlow()
+    override val modifier: Flow<Int> = _modifier.asStateFlow()
 
     override suspend fun addRoll(roll: RollResult) {
         _rollHistory.update { listOf(roll) + it }
@@ -63,6 +92,14 @@ class InMemoryDataRepository : DataRepository {
 
     override suspend fun clearHistory() {
         _rollHistory.value = emptyList()
+    }
+
+    override suspend fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
+        _selectedDice.value = selectedDice
+    }
+
+    override suspend fun setModifier(modifier: Int) {
+        _modifier.value = modifier
     }
 }
 
@@ -97,3 +134,14 @@ private fun SingleDieRollEntity.toDomain(): SingleDieRoll =
         diceType = DiceType.valueOf(diceTypeName),
         value = value
     )
+
+private fun List<TrayDieEntity>.toDomainMap(): Map<DiceType, Int> =
+    mapNotNull { entity ->
+        val diceType = runCatching { DiceType.valueOf(entity.diceTypeName) }.getOrNull()
+        diceType?.let { it to entity.count }
+    }.toMap()
+
+private fun Map<DiceType, Int>.toTrayEntities(): List<TrayDieEntity> =
+    entries
+        .filter { (_, count) -> count > 0 }
+        .map { (type, count) -> TrayDieEntity(type.name, count) }

@@ -19,12 +19,7 @@ fun MainNavigation() {
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
-        entry<Main> {
-          MainScreen(
-            onItemClick = { navKey -> backStack.add(navKey) },
-            modifier = Modifier.safeDrawingPadding().padding(16.dp),
-          )
-        }
+        entry<Main> { MainScreen(modifier = Modifier.safeDrawingPadding().padding(16.dp)) }
       },
   )
 }

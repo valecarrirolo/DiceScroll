@@ -91,7 +91,7 @@ fun DiceSelectionCard(
       Column(
         modifier = Modifier.fillMaxWidth().padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Center,
       ) {
         Box(
           modifier = Modifier.size(40.dp).clip(CircleShape).background(color.copy(alpha = 0.2f)),
@@ -104,21 +104,6 @@ fun DiceSelectionCard(
             fontSize = 14.sp,
           )
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-          text = if (count > 0) "Selected" else "Tap to add",
-          fontSize = 10.sp,
-          textAlign = TextAlign.Center,
-          fontWeight = if (count > 0) FontWeight.Bold else FontWeight.Normal,
-          color =
-            if (count > 0) MaterialTheme.colorScheme.onBackground
-            else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-          modifier = Modifier.height(14.dp),
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
       }
     }
 

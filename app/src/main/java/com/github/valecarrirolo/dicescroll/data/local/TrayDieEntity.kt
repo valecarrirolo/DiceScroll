@@ -6,8 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tray_dice")
 data class TrayDieEntity(
-    @PrimaryKey
-    @ColumnInfo(name = "dice_type_name")
-    val diceTypeName: String,
-    @ColumnInfo(name = "count") val count: Int
+  @PrimaryKey @ColumnInfo(name = "dice_type_name") val diceTypeName: String,
+  @ColumnInfo(name = "count") val count: Int,
 )

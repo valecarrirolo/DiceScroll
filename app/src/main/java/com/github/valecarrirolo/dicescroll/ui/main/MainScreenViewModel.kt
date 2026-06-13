@@ -6,6 +6,7 @@ import com.github.valecarrirolo.dicescroll.data.DataRepository
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,189 +14,170 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 data class DiceUiState(
-    val selectedDice: Map<DiceType, Int> = emptyMap(),
-    val modifier: Int = 0,
-    val isRolling: Boolean = false,
-    val currentRollResult: RollResult? = null,
-    val animatedValues: List<Int> = emptyList(),
-    val rollHistory: List<RollResult> = emptyList()
+  val selectedDice: Map<DiceType, Int> = emptyMap(),
+  val modifier: Int = 0,
+  val isRolling: Boolean = false,
+  val currentRollResult: RollResult? = null,
+  val animatedValues: List<Int> = emptyList(),
+  val rollHistory: List<RollResult> = emptyList(),
 ) {
-    val totalDiceCount: Int get() = selectedDice.values.sum()
+  val totalDiceCount: Int
+    get() = selectedDice.values.sum()
 }
 
 class MainScreenViewModel(private val repository: DataRepository) : ViewModel() {
 
-    private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(
-        mapOf(DiceType.D6 to 1) // default to 1 D6
+  private val _selectedDice =
+    MutableStateFlow<Map<DiceType, Int>>(
+      mapOf(DiceType.D6 to 1) // default to 1 D6
     )
-    private val _modifier = MutableStateFlow(0)
-    private val _isRolling = MutableStateFlow(false)
-    private val _currentRollResult = MutableStateFlow<RollResult?>(null)
-    private val _animatedValues = MutableStateFlow<List<Int>>(emptyList())
+  private val _modifier = MutableStateFlow(0)
+  private val _isRolling = MutableStateFlow(false)
+  private val _currentRollResult = MutableStateFlow<RollResult?>(null)
+  private val _animatedValues = MutableStateFlow<List<Int>>(emptyList())
 
-    init {
-        viewModelScope.launch {
-            repository.selectedDice.collect { selectedDice ->
-                _selectedDice.value = selectedDice
-            }
-        }
-        viewModelScope.launch {
-            repository.modifier.collect { modifier ->
-                _modifier.value = modifier
-            }
-        }
+  init {
+    viewModelScope.launch {
+      repository.selectedDice.collect { selectedDice -> _selectedDice.value = selectedDice }
     }
+    viewModelScope.launch { repository.modifier.collect { modifier -> _modifier.value = modifier } }
+  }
 
-    val uiState: StateFlow<DiceUiState> = combine(
+  val uiState: StateFlow<DiceUiState> =
+    combine(
         _selectedDice,
         _modifier,
         _isRolling,
         _currentRollResult,
         _animatedValues,
-        repository.rollHistory
-    ) { args ->
+        repository.rollHistory,
+      ) { args ->
         @Suppress("UNCHECKED_CAST")
         DiceUiState(
-            selectedDice = args[0] as Map<DiceType, Int>,
-            modifier = args[1] as Int,
-            isRolling = args[2] as Boolean,
-            currentRollResult = args[3] as RollResult?,
-            animatedValues = args[4] as List<Int>,
-            rollHistory = args[5] as List<RollResult>
+          selectedDice = args[0] as Map<DiceType, Int>,
+          modifier = args[1] as Int,
+          isRolling = args[2] as Boolean,
+          currentRollResult = args[3] as RollResult?,
+          animatedValues = args[4] as List<Int>,
+          rollHistory = args[5] as List<RollResult>,
         )
-    }.stateIn(
+      }
+      .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = DiceUiState()
-    )
+        initialValue = DiceUiState(),
+      )
 
-    fun addDie(diceType: DiceType) {
-        if (_isRolling.value) return
-        val updatedDice = _selectedDice.value.toMutableMap().apply {
-            put(diceType, (get(diceType) ?: 0) + 1)
+  fun addDie(diceType: DiceType) {
+    if (_isRolling.value) return
+    val updatedDice =
+      _selectedDice.value.toMutableMap().apply { put(diceType, (get(diceType) ?: 0) + 1) }
+    setSelectedDice(updatedDice)
+  }
+
+  fun removeDie(diceType: DiceType) {
+    if (_isRolling.value) return
+    val currentCount = _selectedDice.value[diceType] ?: return
+    val updatedDice =
+      _selectedDice.value.toMutableMap().apply {
+        if (currentCount <= 1) {
+          remove(diceType)
+        } else {
+          put(diceType, currentCount - 1)
         }
-        setSelectedDice(updatedDice)
-    }
+      }
+    setSelectedDice(updatedDice)
+  }
 
-    fun removeDie(diceType: DiceType) {
-        if (_isRolling.value) return
-        val currentCount = _selectedDice.value[diceType] ?: return
-        val updatedDice = _selectedDice.value.toMutableMap().apply {
-            if (currentCount <= 1) {
-                remove(diceType)
-            } else {
-                put(diceType, currentCount - 1)
-            }
+  fun setModifier(value: Int) {
+    if (_isRolling.value) return
+    _modifier.value = value
+    viewModelScope.launch { repository.setModifier(value) }
+  }
+
+  fun clearTray() {
+    if (_isRolling.value) return
+    setSelectedDice(emptyMap())
+    _currentRollResult.value = null
+    _animatedValues.value = emptyList()
+  }
+
+  fun rollTray() {
+    val diceToRoll = _selectedDice.value.flatMap { (type, count) -> List(count) { type } }
+    if (diceToRoll.isEmpty() || _isRolling.value) return
+
+    viewModelScope.launch {
+      _isRolling.value = true
+      _currentRollResult.value = null
+
+      // Roll animation: generate random intermediate values
+      val animationSteps = 10
+      repeat(animationSteps) { step ->
+        _animatedValues.value = diceToRoll.map { type -> Random.nextInt(1, type.maxVal + 1) }
+        delay(60 + (step * 20).toLong()) // gradually slow down the rolling clatter
+      }
+
+      // Final roll
+      val finalRolls =
+        diceToRoll.map { type ->
+          SingleDieRoll(diceType = type, value = Random.nextInt(1, type.maxVal + 1))
         }
-        setSelectedDice(updatedDice)
-    }
 
-    fun setModifier(value: Int) {
-        if (_isRolling.value) return
-        _modifier.value = value
-        viewModelScope.launch {
-            repository.setModifier(value)
+      val result = RollResult(rolls = finalRolls, modifier = _modifier.value)
+
+      repository.addRoll(result)
+      _currentRollResult.value = result
+      _animatedValues.value = emptyList()
+      _isRolling.value = false
+    }
+  }
+
+  fun rerollFromHistory(roll: RollResult) {
+    if (_isRolling.value || roll.rolls.isEmpty()) return
+
+    viewModelScope.launch {
+      _isRolling.value = true
+      _currentRollResult.value = null
+
+      val snapshots = roll.rolls.map { it.diceSnapshot }
+      val animationSteps = 10
+      repeat(animationSteps) { step ->
+        _animatedValues.value =
+          snapshots.map { snapshot -> Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1) }
+        delay(60 + (step * 20).toLong())
+      }
+
+      val finalRolls =
+        roll.rolls.map { sourceRoll ->
+          val snapshot = sourceRoll.diceSnapshot
+          SingleDieRoll(
+            diceType = sourceRoll.diceType,
+            value = Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1),
+            diceSnapshot = snapshot,
+          )
         }
+      val result = RollResult(rolls = finalRolls, modifier = roll.modifier)
+      val selectedDice = roll.rolls.groupingBy { it.diceType }.eachCount()
+
+      _modifier.value = roll.modifier
+      _selectedDice.value = selectedDice
+      repository.setModifier(roll.modifier)
+      repository.setSelectedDice(selectedDice)
+      repository.addRoll(result)
+      _currentRollResult.value = result
+      _animatedValues.value = emptyList()
+      _isRolling.value = false
     }
+  }
 
-    fun clearTray() {
-        if (_isRolling.value) return
-        setSelectedDice(emptyMap())
-        _currentRollResult.value = null
-        _animatedValues.value = emptyList()
-    }
+  fun clearHistory() {
+    viewModelScope.launch { repository.clearHistory() }
+  }
 
-    fun rollTray() {
-        val diceToRoll = _selectedDice.value.flatMap { (type, count) -> List(count) { type } }
-        if (diceToRoll.isEmpty() || _isRolling.value) return
-
-        viewModelScope.launch {
-            _isRolling.value = true
-            _currentRollResult.value = null
-
-            // Roll animation: generate random intermediate values
-            val animationSteps = 10
-            repeat(animationSteps) { step ->
-                _animatedValues.value = diceToRoll.map { type ->
-                    Random.nextInt(1, type.maxVal + 1)
-                }
-                delay(60 + (step * 20).toLong()) // gradually slow down the rolling clatter
-            }
-
-            // Final roll
-            val finalRolls = diceToRoll.map { type ->
-                SingleDieRoll(
-                    diceType = type,
-                    value = Random.nextInt(1, type.maxVal + 1)
-                )
-            }
-
-            val result = RollResult(
-                rolls = finalRolls,
-                modifier = _modifier.value
-            )
-
-            repository.addRoll(result)
-            _currentRollResult.value = result
-            _animatedValues.value = emptyList()
-            _isRolling.value = false
-        }
-    }
-
-    fun rerollFromHistory(roll: RollResult) {
-        if (_isRolling.value || roll.rolls.isEmpty()) return
-
-        viewModelScope.launch {
-            _isRolling.value = true
-            _currentRollResult.value = null
-
-            val snapshots = roll.rolls.map { it.diceSnapshot }
-            val animationSteps = 10
-            repeat(animationSteps) { step ->
-                _animatedValues.value = snapshots.map { snapshot ->
-                    Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1)
-                }
-                delay(60 + (step * 20).toLong())
-            }
-
-            val finalRolls = roll.rolls.map { sourceRoll ->
-                val snapshot = sourceRoll.diceSnapshot
-                SingleDieRoll(
-                    diceType = sourceRoll.diceType,
-                    value = Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1),
-                    diceSnapshot = snapshot
-                )
-            }
-            val result = RollResult(
-                rolls = finalRolls,
-                modifier = roll.modifier
-            )
-            val selectedDice = roll.rolls.groupingBy { it.diceType }.eachCount()
-
-            _modifier.value = roll.modifier
-            _selectedDice.value = selectedDice
-            repository.setModifier(roll.modifier)
-            repository.setSelectedDice(selectedDice)
-            repository.addRoll(result)
-            _currentRollResult.value = result
-            _animatedValues.value = emptyList()
-            _isRolling.value = false
-        }
-    }
-
-    fun clearHistory() {
-        viewModelScope.launch {
-            repository.clearHistory()
-        }
-    }
-
-    private fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
-        _selectedDice.value = selectedDice
-        viewModelScope.launch {
-            repository.setSelectedDice(selectedDice)
-        }
-    }
+  private fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
+    _selectedDice.value = selectedDice
+    viewModelScope.launch { repository.setSelectedDice(selectedDice) }
+  }
 }

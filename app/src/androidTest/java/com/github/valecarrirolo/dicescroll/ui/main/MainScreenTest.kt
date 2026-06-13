@@ -10,22 +10,20 @@ import org.junit.Test
 /** UI tests for [com.github.valecarrirolo.dicescroll.ui.main.MainScreen]. */
 class MainScreenTest {
 
-    @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    @Before
-    fun setup() {
-        composeTestRule.setContent {
-            MainScreen(onItemClick = {})
-        }
-    }
+  @Before
+  fun setup() {
+    composeTestRule.setContent { MainScreen(onItemClick = {}) }
+  }
 
-    @Test
-    fun appTitle_exists() {
-        composeTestRule.onNodeWithText("DiceScroll").assertExists()
-    }
+  @Test
+  fun appTitle_exists() {
+    composeTestRule.onNodeWithText("DiceScroll").assertExists()
+  }
 
-    @Test
-    fun defaultDicePool_exists() {
-        composeTestRule.onNodeWithText("Dice Pool").assertExists()
-    }
+  @Test
+  fun defaultDicePool_exists() {
+    composeTestRule.onNodeWithText("Dice Pool").assertExists()
+  }
 }

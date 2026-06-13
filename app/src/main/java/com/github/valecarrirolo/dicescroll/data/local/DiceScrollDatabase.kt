@@ -4,15 +4,16 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [
-        AppStateEntity::class,
-        RollResultEntity::class,
-        SingleDieRollEntity::class,
-        TrayDieEntity::class
+  entities =
+    [
+      AppStateEntity::class,
+      RollResultEntity::class,
+      SingleDieRollEntity::class,
+      TrayDieEntity::class,
     ],
-    version = 1,
-    exportSchema = false
+  version = 1,
+  exportSchema = false,
 )
 abstract class DiceScrollDatabase : RoomDatabase() {
-    abstract fun diceScrollDao(): DiceScrollDao
+  abstract fun diceScrollDao(): DiceScrollDao
 }

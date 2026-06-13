@@ -15,12 +15,15 @@ ksp = "2.3.9"
 nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"
 room = "2.7.2"
+spotless = "8.6.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3"}
+androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core"}
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended"}
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui"}
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview"}
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4"}
@@ -47,3 +50,4 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

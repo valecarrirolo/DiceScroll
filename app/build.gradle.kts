@@ -6,42 +6,50 @@ plugins {
 }
 
 android {
-    namespace = "com.github.valecarrirolo.dicescroll"
-    compileSdk = 36
-    defaultConfig {
-        applicationId = "com.github.valecarrirolo.dicescroll"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-    }
+  namespace = "com.github.valecarrirolo.dicescroll"
+  compileSdk = 36
+  defaultConfig {
+    applicationId = "com.github.valecarrirolo.dicescroll"
+    minSdk = 24
+    targetSdk = 36
+    versionCode = 1
+    versionName = "1.0"
+  }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
+  buildTypes {
+    release {
+      isMinifyEnabled = false
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    buildFeatures {
-      compose = true
-      aidl = false
-      buildConfig = false
-      shaders = false
-    }
+  }
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+  buildFeatures {
+    compose = true
+    aidl = false
+    buildConfig = false
+    shaders = false
+  }
 
-    packaging {
-      resources {
-        excludes += "/META-INF/{AL2.0,LGPL2.1}"
-      }
-    }
+  packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+  lint {
+    abortOnError = true
+    warningsAsErrors = true
+    disable +=
+      setOf(
+        "AndroidGradlePluginVersion",
+        "GradleDependency",
+        "NewerVersionAvailable",
+        "OldTargetApi",
+      )
+  }
 }
 
 kotlin {
-    jvmToolchain(17)
+  jvmToolchain(17)
+  compilerOptions { allWarningsAsErrors = true }
 }
 
 dependencies {
@@ -62,8 +70,8 @@ dependencies {
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.compose.material3)
-  implementation("androidx.compose.material:material-icons-core")
-  implementation("androidx.compose.material:material-icons-extended")
+  implementation(libs.androidx.compose.material.icons.core)
+  implementation(libs.androidx.compose.material.icons.extended)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
   // Instrumented tests

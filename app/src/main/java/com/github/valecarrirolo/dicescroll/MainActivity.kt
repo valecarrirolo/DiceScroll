@@ -16,7 +16,11 @@ class MainActivity : ComponentActivity() {
 
     enableEdgeToEdge()
     setContent {
-      DiceScrollTheme { Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { MainNavigation() } }
+      DiceScrollTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+          MainNavigation()
+        }
+      }
     }
   }
 }

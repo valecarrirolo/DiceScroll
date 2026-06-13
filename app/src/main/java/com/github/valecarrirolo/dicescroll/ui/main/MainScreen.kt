@@ -448,29 +448,25 @@ fun TrayContent(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 84.dp),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val chunks = itemsToDisplay.chunked(4)
-                items(chunks) { rowItems ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                gridItems(itemsToDisplay) { (type, value) ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        rowItems.forEach { (type, value) ->
-                            DieItem(
-                                type = type,
-                                value = value,
-                                isRolling = state.isRolling,
-                                isHighlighted = type == highlightedDie,
-                                onClick = type?.let { { onRemoveDie(it) } }
-                            )
-                        }
+                        DieItem(
+                            type = type,
+                            value = value,
+                            isRolling = state.isRolling,
+                            isHighlighted = type == highlightedDie,
+                            onClick = type?.let { { onRemoveDie(it) } }
+                        )
                     }
                 }
             }

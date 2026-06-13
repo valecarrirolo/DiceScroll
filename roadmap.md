@@ -56,7 +56,7 @@ Goal: make session data durable and make history useful during play.
 
 Tasks:
 
-* [ ] Introduce Room as the local persistence layer.
+* [x] Introduce Room as the local persistence layer.
 * [ ] Persist roll history.
 * [ ] Persist and restore the current tray state.
 * [ ] Replace the history bottom sheet with a dedicated bottom navigation tab.

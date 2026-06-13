@@ -817,8 +817,8 @@ fun HistoryTabContent(
 fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
     val timeStr = remember(roll.timestamp) { dateFormat.format(Date(roll.timestamp)) }
     val diceSummary = remember(roll.rolls) {
-        roll.rolls.groupBy { it.diceType }
-            .map { (type, list) -> "${list.size}${type.displayName}" }
+        roll.rolls.groupBy { it.diceSnapshot.displayName }
+            .map { (displayName, list) -> "${list.size}$displayName" }
             .joinToString(", ")
     }
 

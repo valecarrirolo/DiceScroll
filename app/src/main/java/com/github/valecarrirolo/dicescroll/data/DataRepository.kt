@@ -9,6 +9,7 @@ import com.github.valecarrirolo.dicescroll.data.local.RollResultWithDice
 import com.github.valecarrirolo.dicescroll.data.local.SingleDieRollEntity
 import com.github.valecarrirolo.dicescroll.data.local.AppStateEntity
 import com.github.valecarrirolo.dicescroll.data.local.TrayDieEntity
+import com.github.valecarrirolo.dicescroll.data.model.DiceSnapshot
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
@@ -111,10 +112,10 @@ private fun SingleDieRoll.toEntity(rollId: String, sortIndex: Int): SingleDieRol
         id,
         rollId,
         sortIndex,
-        diceType.name,
-        diceType.displayName,
-        diceType.maxVal,
-        diceType.colorHex,
+        diceSnapshot.typeId,
+        diceSnapshot.displayName,
+        diceSnapshot.faces,
+        diceSnapshot.colorHex,
         value
     )
 
@@ -132,7 +133,13 @@ private fun SingleDieRollEntity.toDomain(): SingleDieRoll =
     SingleDieRoll(
         id = id,
         diceType = DiceType.valueOf(diceTypeName),
-        value = value
+        value = value,
+        diceSnapshot = DiceSnapshot(
+            typeId = diceTypeName,
+            displayName = diceDisplayName,
+            faces = diceFaces,
+            colorHex = diceColorHex
+        )
     )
 
 private fun List<TrayDieEntity>.toDomainMap(): Map<DiceType, Int> =

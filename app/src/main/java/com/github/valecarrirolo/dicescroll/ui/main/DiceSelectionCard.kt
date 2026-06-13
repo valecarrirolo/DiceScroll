@@ -94,14 +94,18 @@ fun DiceSelectionCard(
         verticalArrangement = Arrangement.Center,
       ) {
         Box(
-          modifier = Modifier.size(40.dp).clip(CircleShape).background(color.copy(alpha = 0.2f)),
+          modifier = Modifier
+            .size(54.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.2f))
+            .border(1.5.dp, color.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
           contentAlignment = Alignment.Center,
         ) {
           Text(
             text = type.displayName,
             fontWeight = FontWeight.ExtraBold,
             color = color,
-            fontSize = 14.sp,
+            fontSize = 18.sp,
           )
         }
       }

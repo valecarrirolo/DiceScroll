@@ -81,4 +81,26 @@ class MainScreenViewModelTest {
         assertEquals(1, state.rollHistory.size)
         assertEquals(state.currentRollResult, state.rollHistory.first())
     }
+
+    @Test
+    fun rerollFromHistory_usesSnapshotAndLogsHistory() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        viewModel.addDie(DiceType.D20)
+        viewModel.setModifier(3)
+        testScheduler.advanceUntilIdle()
+        viewModel.rollTray()
+        testScheduler.advanceUntilIdle()
+        val originalRoll = viewModel.uiState.value.rollHistory.first()
+
+        viewModel.rerollFromHistory(originalRoll)
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        val reroll = state.rollHistory.first()
+        assertEquals(2, state.rollHistory.size)
+        assertEquals(originalRoll.rolls.map { it.diceSnapshot }, reroll.rolls.map { it.diceSnapshot })
+        assertEquals(originalRoll.modifier, reroll.modifier)
+    }
 }

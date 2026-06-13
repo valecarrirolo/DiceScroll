@@ -145,6 +145,47 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
         }
     }
 
+    fun rerollFromHistory(roll: RollResult) {
+        if (_isRolling.value || roll.rolls.isEmpty()) return
+
+        viewModelScope.launch {
+            _isRolling.value = true
+            _currentRollResult.value = null
+
+            val snapshots = roll.rolls.map { it.diceSnapshot }
+            val animationSteps = 10
+            repeat(animationSteps) { step ->
+                _animatedValues.value = snapshots.map { snapshot ->
+                    Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1)
+                }
+                delay(60 + (step * 20).toLong())
+            }
+
+            val finalRolls = roll.rolls.map { sourceRoll ->
+                val snapshot = sourceRoll.diceSnapshot
+                SingleDieRoll(
+                    diceType = sourceRoll.diceType,
+                    value = Random.nextInt(1, snapshot.faces.coerceAtLeast(1) + 1),
+                    diceSnapshot = snapshot
+                )
+            }
+            val result = RollResult(
+                rolls = finalRolls,
+                modifier = roll.modifier
+            )
+            val selectedDice = roll.rolls.groupingBy { it.diceType }.eachCount()
+
+            _modifier.value = roll.modifier
+            _selectedDice.value = selectedDice
+            repository.setModifier(roll.modifier)
+            repository.setSelectedDice(selectedDice)
+            repository.addRoll(result)
+            _currentRollResult.value = result
+            _animatedValues.value = emptyList()
+            _isRolling.value = false
+        }
+    }
+
     fun clearHistory() {
         viewModelScope.launch {
             repository.clearHistory()

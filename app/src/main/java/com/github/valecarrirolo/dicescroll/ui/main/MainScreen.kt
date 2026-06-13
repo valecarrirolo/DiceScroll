@@ -79,6 +79,10 @@ fun MainScreen(
         onClearTray = { viewModel.clearTray() },
         onShowHistory = { selectedTab = MainTab.History },
         onClearHistory = { viewModel.clearHistory() },
+        onRerollHistory = { roll ->
+            viewModel.rerollFromHistory(roll)
+            selectedTab = MainTab.Roller
+        },
         onSetModifier = { viewModel.setModifier(it) },
         onRoll = { viewModel.rollTray() },
         onAddDie = { viewModel.addDie(it) },
@@ -107,6 +111,7 @@ fun MainScreenContent(
     selectedTab: MainTab = MainTab.Roller,
     onTabSelected: (MainTab) -> Unit = {},
     onClearHistory: () -> Unit = {},
+    onRerollHistory: (RollResult) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var recentlyAddedDie by remember { mutableStateOf<DiceType?>(null) }
@@ -166,6 +171,7 @@ fun MainScreenContent(
             HistoryTabContent(
                 state = state,
                 onClearHistory = onClearHistory,
+                onReroll = onRerollHistory,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
@@ -754,6 +760,7 @@ fun DiceSelectionCard(
 fun HistoryTabContent(
     state: DiceUiState,
     onClearHistory: () -> Unit,
+    onReroll: (RollResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
@@ -806,7 +813,11 @@ fun HistoryTabContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(state.rollHistory) { roll ->
-                    HistoryItem(roll = roll, dateFormat = dateFormat)
+                    HistoryItem(
+                        roll = roll,
+                        dateFormat = dateFormat,
+                        onReroll = onReroll
+                    )
                 }
             }
         }
@@ -814,7 +825,11 @@ fun HistoryTabContent(
 }
 
 @Composable
-fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
+fun HistoryItem(
+    roll: RollResult,
+    dateFormat: SimpleDateFormat,
+    onReroll: (RollResult) -> Unit = {}
+) {
     val timeStr = remember(roll.timestamp) { dateFormat.format(Date(roll.timestamp)) }
     val diceSummary = remember(roll.rolls) {
         roll.rolls.groupBy { it.diceSnapshot.displayName }
@@ -883,6 +898,15 @@ fun HistoryItem(roll: RollResult, dateFormat: SimpleDateFormat) {
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                 )
+                TextButton(onClick = { onReroll(roll) }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Reroll", fontSize = 11.sp)
+                }
             }
         }
     }

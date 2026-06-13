@@ -62,7 +62,7 @@ Tasks:
 * [x] Replace the history bottom sheet with a dedicated bottom navigation tab.
 * [x] Show full local date and time for each roll.
 * [x] Store roll history as immutable snapshots of the dice definitions used at roll time.
-* [ ] Support rerolling from history by executing the stored snapshot, not a mutable current definition.
+* [x] Support rerolling from history by executing the stored snapshot, not a mutable current definition.
 
 Conceptual interfaces:
 

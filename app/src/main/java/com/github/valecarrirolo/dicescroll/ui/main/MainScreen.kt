@@ -202,7 +202,7 @@ fun MainScreenContent(
                         )
                     }
                 } else {
-                    TrayContent(state = state)
+                    TrayContent(state = state, onRemoveDie = onRemoveDie)
                 }
             }
 
@@ -351,7 +351,10 @@ fun MainScreenContent(
 }
 
 @Composable
-fun TrayContent(state: DiceUiState) {
+fun TrayContent(
+    state: DiceUiState,
+    onRemoveDie: (DiceType) -> Unit
+) {
     val itemsToDisplay = remember(state.isRolling, state.animatedValues, state.currentRollResult) {
         if (state.isRolling) {
             state.animatedValues.map { Pair(null, it) }
@@ -444,7 +447,8 @@ fun TrayContent(state: DiceUiState) {
                             DieItem(
                                 type = type,
                                 value = value,
-                                isRolling = state.isRolling
+                                isRolling = state.isRolling,
+                                onClick = type?.let { { onRemoveDie(it) } }
                             )
                         }
                     }
@@ -458,7 +462,8 @@ fun TrayContent(state: DiceUiState) {
 fun DieItem(
     type: DiceType?,
     value: Int,
-    isRolling: Boolean
+    isRolling: Boolean,
+    onClick: (() -> Unit)? = null
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ShakeAnim")
     val rotation by infiniteTransition.animateFloat(
@@ -481,7 +486,7 @@ fun DieItem(
         label = "ShakeScale"
     )
 
-    val modifier = if (isRolling) {
+    val animationModifier = if (isRolling) {
         Modifier
             .graphicsLayer {
                 rotationZ = rotation
@@ -492,15 +497,22 @@ fun DieItem(
         Modifier
     }
 
+    val clickModifier = if (!isRolling && type != null && onClick != null) {
+        Modifier.clickable { onClick() }
+    } else {
+        Modifier
+    }
+
     val color = type?.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: NeonPurple
 
     Box(
-        modifier = modifier
+        modifier = animationModifier
             .padding(8.dp)
             .size(64.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(color.copy(alpha = 0.15f))
-            .border(2.dp, color, RoundedCornerShape(16.dp)),
+            .border(2.dp, color, RoundedCornerShape(16.dp))
+            .then(clickModifier),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -36,7 +36,7 @@ Tasks:
 * [x] Replace the horizontal dice pool with a grid that keeps all standard dice visible on typical phone screens.
 * [x] Remove add/delete controls from dice pool cards.
 * [x] Add dice by tapping a die in the pool.
-* [ ] Remove a specific die by tapping it in the tray.
+* [x] Remove a specific die by tapping it in the tray.
 * [ ] Add a basic pool-to-tray selection animation.
 * [ ] Make the tray responsive so dice never overlap and remain visible through a grid or scrollable layout.
 * [ ] Move modifiers into a collapsible section that can be hidden, expanded, enabled, or disabled.

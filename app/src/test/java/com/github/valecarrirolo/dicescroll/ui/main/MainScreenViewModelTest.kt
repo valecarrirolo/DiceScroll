@@ -1,6 +1,6 @@
 package com.github.valecarrirolo.dicescroll.ui.main
 
-import com.github.valecarrirolo.dicescroll.data.DefaultDataRepository
+import com.github.valecarrirolo.dicescroll.data.InMemoryDataRepository
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -16,13 +16,13 @@ import org.junit.Test
 class MainScreenViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var repository: DefaultDataRepository
+    private lateinit var repository: InMemoryDataRepository
     private lateinit var viewModel: MainScreenViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = DefaultDataRepository()
+        repository = InMemoryDataRepository()
         viewModel = MainScreenViewModel(repository)
     }
 

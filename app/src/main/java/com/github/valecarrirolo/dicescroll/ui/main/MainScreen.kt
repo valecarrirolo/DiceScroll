@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +53,7 @@ import java.util.Locale
 fun MainScreen(
     onItemClick: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) }
+    viewModel: MainScreenViewModel = defaultMainScreenViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val haptic = LocalHapticFeedback.current
@@ -92,6 +93,12 @@ fun MainScreen(
             )
         }
     }
+}
+
+@Composable
+private fun defaultMainScreenViewModel(): MainScreenViewModel {
+    val context = LocalContext.current.applicationContext
+    return viewModel { MainScreenViewModel(DefaultDataRepository(context)) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

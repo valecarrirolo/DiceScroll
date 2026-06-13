@@ -65,7 +65,7 @@ fun DiceSelectionCard(
     )
 
   Box(
-    modifier = Modifier.padding(top = 4.dp, end = 4.dp)
+    modifier = Modifier.padding(top = 10.dp, end = 10.dp)
   ) {
     Card(
       modifier =
@@ -131,7 +131,7 @@ fun DiceSelectionCard(
         modifier = Modifier
           .size(24.dp)
           .align(Alignment.TopEnd)
-          .offset(x = 4.dp, y = (-4).dp)
+          .offset(x = 10.dp, y = (-10).dp)
       ) {
         Box(contentAlignment = Alignment.Center) {
           Text(

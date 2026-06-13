@@ -37,7 +37,7 @@ Tasks:
 * [x] Remove add/delete controls from dice pool cards.
 * [x] Add dice by tapping a die in the pool.
 * [x] Remove a specific die by tapping it in the tray.
-* [ ] Add a basic pool-to-tray selection animation.
+* [x] Add a basic pool-to-tray selection animation.
 * [ ] Make the tray responsive so dice never overlap and remain visible through a grid or scrollable layout.
 * [ ] Move modifiers into a collapsible section that can be hidden, expanded, enabled, or disabled.
 

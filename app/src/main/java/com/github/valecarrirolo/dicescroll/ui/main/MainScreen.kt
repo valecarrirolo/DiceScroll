@@ -41,6 +41,7 @@ import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
 import com.github.valecarrirolo.dicescroll.theme.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -105,6 +106,15 @@ fun MainScreenContent(
     onRemoveDie: (DiceType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var recentlyAddedDie by remember { mutableStateOf<DiceType?>(null) }
+
+    LaunchedEffect(recentlyAddedDie) {
+        if (recentlyAddedDie != null) {
+            delay(260)
+            recentlyAddedDie = null
+        }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -202,7 +212,11 @@ fun MainScreenContent(
                         )
                     }
                 } else {
-                    TrayContent(state = state, onRemoveDie = onRemoveDie)
+                    TrayContent(
+                        state = state,
+                        highlightedDie = recentlyAddedDie,
+                        onRemoveDie = onRemoveDie
+                    )
                 }
             }
 
@@ -342,7 +356,11 @@ fun MainScreenContent(
                     DiceSelectionCard(
                         type = type,
                         count = count,
-                        onAdd = { onAddDie(type) }
+                        isRecentlyAdded = recentlyAddedDie == type,
+                        onAdd = {
+                            recentlyAddedDie = type
+                            onAddDie(type)
+                        }
                     )
                 }
             }
@@ -353,6 +371,7 @@ fun MainScreenContent(
 @Composable
 fun TrayContent(
     state: DiceUiState,
+    highlightedDie: DiceType?,
     onRemoveDie: (DiceType) -> Unit
 ) {
     val itemsToDisplay = remember(state.isRolling, state.animatedValues, state.currentRollResult) {
@@ -448,6 +467,7 @@ fun TrayContent(
                                 type = type,
                                 value = value,
                                 isRolling = state.isRolling,
+                                isHighlighted = type == highlightedDie,
                                 onClick = type?.let { { onRemoveDie(it) } }
                             )
                         }
@@ -463,6 +483,7 @@ fun DieItem(
     type: DiceType?,
     value: Int,
     isRolling: Boolean,
+    isHighlighted: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ShakeAnim")
@@ -503,10 +524,17 @@ fun DieItem(
         Modifier
     }
 
+    val highlightScale by animateFloatAsState(
+        targetValue = if (!isRolling && isHighlighted) 1.08f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "TrayDieHighlight"
+    )
+
     val color = type?.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: NeonPurple
 
     Box(
         modifier = animationModifier
+            .scale(highlightScale)
             .padding(8.dp)
             .size(64.dp)
             .clip(RoundedCornerShape(16.dp))
@@ -539,13 +567,20 @@ fun DieItem(
 fun DiceSelectionCard(
     type: DiceType,
     count: Int,
+    isRecentlyAdded: Boolean = false,
     onAdd: () -> Unit
 ) {
     val color = Color(android.graphics.Color.parseColor(type.colorHex))
+    val cardScale by animateFloatAsState(
+        targetValue = if (isRecentlyAdded) 1.06f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "DicePoolSelection"
+    )
 
     Card(
         modifier = Modifier
             .width(86.dp)
+            .scale(cardScale)
             .clickable { onAdd() }
             .border(
                 width = 1.dp,

@@ -6,10 +6,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,12 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -34,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -53,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -96,7 +96,6 @@ fun MainScreen(
     selectedTab = selectedTab,
     onTabSelected = { selectedTab = it },
     onClearTray = { viewModel.clearTray() },
-    onShowHistory = { selectedTab = MainTab.History },
     onClearHistory = { viewModel.clearHistory() },
     onRerollHistory = { roll ->
       viewModel.rerollFromHistory(roll)
@@ -116,8 +115,6 @@ private fun defaultMainScreenViewModel(): MainScreenViewModel {
   return viewModel { MainScreenViewModel(DefaultDataRepository(context)) }
 }
 
-// ================= PREVIEWS =================
-
 @Preview(showBackground = true, name = "Main Screen Light")
 @Composable
 fun MainScreenContentLightPreview() {
@@ -127,7 +124,6 @@ fun MainScreenContentLightPreview() {
         state =
           DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
         onClearTray = {},
-        onShowHistory = {},
         onSetModifier = {},
         onRoll = {},
         onAddDie = {},
@@ -149,7 +145,6 @@ fun MainScreenContentDarkPreview() {
             modifier = -1,
           ),
         onClearTray = {},
-        onShowHistory = {},
         onSetModifier = {},
         onRoll = {},
         onAddDie = {},
@@ -167,7 +162,6 @@ fun TrayContentEmptyPreview() {
       MainScreenContent(
         state = DiceUiState(selectedDice = emptyMap()),
         onClearTray = {},
-        onShowHistory = {},
         onSetModifier = {},
         onRoll = {},
         onAddDie = {},
@@ -190,7 +184,6 @@ fun TrayContentRollingPreview() {
             animatedValues = listOf(3, 5),
           ),
         onClearTray = {},
-        onShowHistory = {},
         onSetModifier = {},
         onRoll = {},
         onAddDie = {},
@@ -205,7 +198,6 @@ fun TrayContentRollingPreview() {
 fun MainScreenContent(
   state: DiceUiState,
   onClearTray: () -> Unit,
-  onShowHistory: () -> Unit,
   onSetModifier: (Int) -> Unit,
   onRoll: () -> Unit,
   onAddDie: (DiceType) -> Unit,
@@ -217,8 +209,8 @@ fun MainScreenContent(
   onRerollHistory: (RollResult) -> Unit = {},
 ) {
   var recentlyAddedDie by remember { mutableStateOf<DiceType?>(null) }
-  var modifierExpanded by remember { mutableStateOf(false) }
   var modifierEnabled by remember { mutableStateOf(true) }
+  var showModifierSheet by remember { mutableStateOf(false) }
 
   LaunchedEffect(recentlyAddedDie) {
     if (recentlyAddedDie != null) {
@@ -227,21 +219,35 @@ fun MainScreenContent(
     }
   }
 
+  if (showModifierSheet) {
+    ModifierControlsSheet(
+      modifierValue = state.modifier,
+      modifierEnabled = modifierEnabled,
+      onModifierEnabledChange = { modifierEnabled = it },
+      onSetModifier = onSetModifier,
+      onDismiss = { showModifierSheet = false },
+    )
+  }
+
   Scaffold(
     modifier = modifier.fillMaxSize(),
-    topBar = { MainTopBar(onClearTray = onClearTray, onShowHistory = onShowHistory) },
-    bottomBar = { DiceScrollBottomBar(selectedTab = selectedTab, onTabSelected = onTabSelected) },
+    topBar = {
+      Column {
+        MainTopBar(onClearTray = onClearTray)
+        MainTabs(selectedTab = selectedTab, onTabSelected = onTabSelected)
+      }
+    },
   ) { innerPadding ->
     if (selectedTab == MainTab.History) {
       HistoryTabContent(
         state = state,
         onClearHistory = onClearHistory,
         onReroll = onRerollHistory,
-        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 12.dp),
       )
     } else {
       Column(
-        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 12.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
       ) {
@@ -249,26 +255,17 @@ fun MainScreenContent(
           state = state,
           highlightedDie = recentlyAddedDie,
           onRemoveDie = onRemoveDie,
-          modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 12.dp),
+          modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 8.dp, bottom = 10.dp),
         )
 
-        ModifierSection(
-          modifierValue = state.modifier,
-          expanded = modifierExpanded,
-          enabled = modifierEnabled,
-          onExpandedChange = { modifierExpanded = it },
-          onEnabledChange = { enabled ->
-            modifierEnabled = enabled
-            if (!enabled) onSetModifier(0)
-          },
-          onSetModifier = onSetModifier,
+        RollControls(
+          state = state,
+          modifierEnabled = modifierEnabled,
+          onModifierClick = { showModifierSheet = true },
+          onRoll = onRoll,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        RollButton(state = state, onRoll = onRoll)
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         DicePool(
           state = state,
@@ -285,7 +282,7 @@ fun MainScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MainTopBar(onClearTray: () -> Unit, onShowHistory: () -> Unit) {
+private fun MainTopBar(onClearTray: () -> Unit) {
   TopAppBar(
     title = {
       Text(
@@ -304,16 +301,51 @@ private fun MainTopBar(onClearTray: () -> Unit, onShowHistory: () -> Unit) {
           tint = MaterialTheme.colorScheme.onBackground,
         )
       }
-      IconButton(onClick = onShowHistory) {
-        Icon(
-          imageVector = Icons.AutoMirrored.Filled.List,
-          contentDescription = "View History",
-          tint = MaterialTheme.colorScheme.onBackground,
-        )
-      }
     },
     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
   )
+}
+
+@Composable
+private fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
+  Surface(
+    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 6.dp),
+    shape = RoundedCornerShape(18.dp),
+    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
+  ) {
+    Row(modifier = Modifier.padding(3.dp).testTag("main-tabs")) {
+      MainTab.values().forEach { tab ->
+        val selected = selectedTab == tab
+        Box(
+          modifier =
+            Modifier.weight(1f)
+              .clip(RoundedCornerShape(15.dp))
+              .background(
+                if (selected) {
+                  Brush.linearGradient(colors = listOf(NeonPurple, NeonTeal))
+                } else {
+                  Brush.linearGradient(colors = listOf(Color.Transparent, Color.Transparent))
+                }
+              )
+              .clickable { onTabSelected(tab) }
+              .padding(vertical = 8.dp),
+          contentAlignment = Alignment.Center,
+        ) {
+          Text(
+            text = tab.name,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+            fontSize = 13.sp,
+            color =
+              if (selected) {
+                Color.White
+              } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+              },
+          )
+        }
+      }
+    }
+  }
 }
 
 @Composable
@@ -326,12 +358,12 @@ private fun TrayPanel(
   Box(
     modifier =
       modifier
-        .clip(RoundedCornerShape(24.dp))
+        .clip(RoundedCornerShape(20.dp))
         .background(
           Brush.verticalGradient(
             colors =
               listOf(
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
                 MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
               )
           )
@@ -341,7 +373,7 @@ private fun TrayPanel(
           Brush.linearGradient(
             colors = listOf(NeonPurple.copy(alpha = 0.5f), NeonTeal.copy(alpha = 0.5f))
           ),
-          RoundedCornerShape(24.dp),
+          RoundedCornerShape(20.dp),
         ),
     contentAlignment = Alignment.Center,
   ) {
@@ -358,15 +390,15 @@ private fun EmptyTrayMessage() {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
-    modifier = Modifier.padding(24.dp),
+    modifier = Modifier.padding(20.dp),
   ) {
     Icon(
       imageVector = Icons.Default.Info,
       contentDescription = null,
       tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-      modifier = Modifier.size(48.dp),
+      modifier = Modifier.size(44.dp),
     )
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(10.dp))
     Text(
       text = "Tray is empty",
       fontWeight = FontWeight.Bold,
@@ -383,7 +415,29 @@ private fun EmptyTrayMessage() {
 }
 
 @Composable
-private fun RollButton(state: DiceUiState, onRoll: () -> Unit) {
+private fun RollControls(
+  state: DiceUiState,
+  modifierEnabled: Boolean,
+  onModifierClick: () -> Unit,
+  onRoll: () -> Unit,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.spacedBy(10.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    ModifierChip(
+      modifierValue = state.modifier,
+      modifierEnabled = modifierEnabled,
+      onClick = onModifierClick,
+      modifier = Modifier.height(52.dp),
+    )
+    RollButton(state = state, onRoll = onRoll, modifier = Modifier.weight(1f))
+  }
+}
+
+@Composable
+private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifier = Modifier) {
   val enabled = state.selectedDice.isNotEmpty() && !state.isRolling
   val buttonScale = remember { Animatable(1f) }
   val coroutineScope = rememberCoroutineScope()
@@ -400,11 +454,7 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit) {
       onRoll()
     },
     enabled = enabled,
-    modifier =
-      Modifier.fillMaxWidth()
-        .height(60.dp)
-        .scale(buttonScale.value)
-        .clip(RoundedCornerShape(30.dp)),
+    modifier = modifier.height(52.dp).scale(buttonScale.value).clip(RoundedCornerShape(26.dp)),
     colors =
       ButtonDefaults.buttonColors(
         containerColor = Color.Transparent,
@@ -437,7 +487,7 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit) {
             state.totalDiceCount > 0 -> "ROLL ${state.totalDiceCount} DICE"
             else -> "SELECT DICE"
           },
-        fontSize = 18.sp,
+        fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
         color = if (enabled) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -462,10 +512,10 @@ private fun DicePool(
   Spacer(modifier = Modifier.height(6.dp))
 
   LazyVerticalGrid(
-    columns = GridCells.Fixed(4),
-    modifier = Modifier.fillMaxWidth().height(150.dp).padding(bottom = 16.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp),
-    verticalArrangement = Arrangement.spacedBy(10.dp),
+    columns = GridCells.Adaptive(minSize = 76.dp),
+    modifier = Modifier.fillMaxWidth().height(144.dp).padding(bottom = 10.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
     userScrollEnabled = false,
   ) {
     gridItems(DiceType.values()) { type ->

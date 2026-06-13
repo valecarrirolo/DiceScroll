@@ -534,6 +534,7 @@ fun DiceSelectionCard(
     Card(
         modifier = Modifier
             .width(86.dp)
+            .clickable { onAdd() }
             .border(
                 width = 1.dp,
                 color = if (count > 0) color else MaterialTheme.colorScheme.outlineVariant,
@@ -559,8 +560,7 @@ fun DiceSelectionCard(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(color.copy(alpha = 0.2f))
-                    .clickable { onAdd() },
+                    .background(color.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

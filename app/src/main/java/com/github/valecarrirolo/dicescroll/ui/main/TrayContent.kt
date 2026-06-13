@@ -51,11 +51,7 @@ import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 
-data class TrayDieInstance(
-  val key: String,
-  val type: DiceType?,
-  val value: Int
-)
+data class TrayDieInstance(val key: String, val type: DiceType?, val value: Int)
 
 @Preview(showBackground = true, name = "Tray Content Preview")
 @Composable
@@ -63,11 +59,9 @@ fun TrayContentPreview() {
   DiceScrollTheme(darkTheme = true) {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).size(300.dp)) {
       TrayContent(
-        state = DiceUiState(
-          selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)
-        ),
+        state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
         highlightedDie = null,
-        onRemoveDie = {}
+        onRemoveDie = {},
       )
     }
   }
@@ -98,11 +92,11 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
     }
 
   Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
+    modifier = Modifier.fillMaxSize().padding(10.dp),
     verticalArrangement = Arrangement.SpaceBetween,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Box(modifier = Modifier.fillMaxWidth().height(60.dp), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
       AnimatedContent(
         targetState = Pair(state.isRolling, state.currentRollResult),
         transitionSpec = {
@@ -115,7 +109,7 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
           Text(
             text = "Rolling...",
             fontWeight = FontWeight.Black,
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontFamily = FontFamily.Monospace,
             color = NeonTeal,
           )
@@ -130,7 +124,7 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
             Text(
               text = "${result.total}",
               fontWeight = FontWeight.Black,
-              fontSize = 36.sp,
+              fontSize = 34.sp,
               fontFamily = FontFamily.Monospace,
               color = NeonTeal,
             )
@@ -148,20 +142,15 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
 
     Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
       LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 84.dp),
+        columns = GridCells.Adaptive(minSize = 68.dp),
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
       ) {
-        items(
-          items = itemsToDisplay,
-          key = { it.key }
-        ) { dieInstance ->
+        items(items = itemsToDisplay, key = { it.key }) { dieInstance ->
           Box(
-            modifier = Modifier
-              .fillMaxWidth()
-              .animateItem(),
+            modifier = Modifier.fillMaxWidth().animateItem(),
             contentAlignment = Alignment.Center,
           ) {
             DieItem(
@@ -252,21 +241,21 @@ fun DieItem(
     modifier =
       animationModifier
         .scale(highlightScale)
-        .padding(8.dp)
-        .size(64.dp)
-        .clip(RoundedCornerShape(16.dp))
+        .padding(4.dp)
+        .size(58.dp)
+        .clip(RoundedCornerShape(14.dp))
         .background(color.copy(alpha = 0.15f))
-        .border(2.dp, color, RoundedCornerShape(16.dp))
+        .border(2.dp, color, RoundedCornerShape(14.dp))
         .then(clickModifier),
     contentAlignment = Alignment.Center,
   ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
       if (type != null) {
-        Text(text = type.displayName, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = color)
+        Text(text = type.displayName, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = color)
       }
       Text(
         text = if (value > 0) "$value" else "?",
-        fontSize = 22.sp,
+        fontSize = 21.sp,
         fontWeight = FontWeight.Black,
         fontFamily = FontFamily.Monospace,
         color =

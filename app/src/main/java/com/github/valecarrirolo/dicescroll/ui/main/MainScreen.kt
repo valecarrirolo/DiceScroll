@@ -7,8 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -325,13 +327,17 @@ fun MainScreenContent(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            LazyRow(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(150.dp)
                     .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                userScrollEnabled = false
             ) {
-                items(DiceType.values()) { type ->
+                gridItems(DiceType.values()) { type ->
                     val count = state.selectedDice[type] ?: 0
                     DiceSelectionCard(
                         type = type,

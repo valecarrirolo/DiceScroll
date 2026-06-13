@@ -19,9 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -53,6 +56,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,6 +64,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.valecarrirolo.dicescroll.data.DefaultDataRepository
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
+import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 import kotlinx.coroutines.delay
@@ -109,6 +114,90 @@ fun MainScreen(
 private fun defaultMainScreenViewModel(): MainScreenViewModel {
   val context = LocalContext.current.applicationContext
   return viewModel { MainScreenViewModel(DefaultDataRepository(context)) }
+}
+
+// ================= PREVIEWS =================
+
+@Preview(showBackground = true, name = "Main Screen Light")
+@Composable
+fun MainScreenContentLightPreview() {
+  DiceScrollTheme(darkTheme = false) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+      MainScreenContent(
+        state =
+          DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
+        onClearTray = {},
+        onShowHistory = {},
+        onSetModifier = {},
+        onRoll = {},
+        onAddDie = {},
+        onRemoveDie = {},
+      )
+    }
+  }
+}
+
+@Preview(showBackground = true, name = "Main Screen Dark")
+@Composable
+fun MainScreenContentDarkPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+      MainScreenContent(
+        state =
+          DiceUiState(
+            selectedDice = mapOf(DiceType.D4 to 1, DiceType.D12 to 1, DiceType.D100 to 1),
+            modifier = -1,
+          ),
+        onClearTray = {},
+        onShowHistory = {},
+        onSetModifier = {},
+        onRoll = {},
+        onAddDie = {},
+        onRemoveDie = {},
+      )
+    }
+  }
+}
+
+@Preview(showBackground = true, name = "Tray Empty")
+@Composable
+fun TrayContentEmptyPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).fillMaxWidth()) {
+      MainScreenContent(
+        state = DiceUiState(selectedDice = emptyMap()),
+        onClearTray = {},
+        onShowHistory = {},
+        onSetModifier = {},
+        onRoll = {},
+        onAddDie = {},
+        onRemoveDie = {},
+      )
+    }
+  }
+}
+
+@Preview(showBackground = true, name = "Tray Rolling")
+@Composable
+fun TrayContentRollingPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+      MainScreenContent(
+        state =
+          DiceUiState(
+            selectedDice = mapOf(DiceType.D6 to 2),
+            isRolling = true,
+            animatedValues = listOf(3, 5),
+          ),
+        onClearTray = {},
+        onShowHistory = {},
+        onSetModifier = {},
+        onRoll = {},
+        onAddDie = {},
+        onRemoveDie = {},
+      )
+    }
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

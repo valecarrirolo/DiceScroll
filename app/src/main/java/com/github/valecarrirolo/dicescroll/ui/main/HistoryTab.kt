@@ -1,5 +1,6 @@
 package com.github.valecarrirolo.dicescroll.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,9 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
+import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
+import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -85,6 +90,27 @@ fun HistoryTabContent(
           HistoryItem(roll = roll, dateFormat = dateFormat, onReroll = onReroll)
         }
       }
+    }
+  }
+}
+
+@Preview(showBackground = true, name = "History Item")
+@Composable
+fun HistoryItemPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.background)) {
+      HistoryItem(
+        roll =
+          RollResult(
+            rolls =
+              listOf(
+                SingleDieRoll(diceType = DiceType.D6, value = 4),
+                SingleDieRoll(diceType = DiceType.D20, value = 15),
+              ),
+            modifier = 2,
+          ),
+        dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()),
+      )
     }
   }
 }

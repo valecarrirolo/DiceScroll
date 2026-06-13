@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,23 +42,58 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
+import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+
+data class TrayDieInstance(
+  val key: String,
+  val type: DiceType?,
+  val value: Int
+)
+
+@Preview(showBackground = true, name = "Tray Content Preview")
+@Composable
+fun TrayContentPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).size(300.dp)) {
+      TrayContent(
+        state = DiceUiState(
+          selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)
+        ),
+        highlightedDie = null,
+        onRemoveDie = {}
+      )
+    }
+  }
+}
 
 @Composable
 fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (DiceType) -> Unit) {
   val itemsToDisplay =
     remember(state.isRolling, state.animatedValues, state.currentRollResult) {
       if (state.isRolling) {
-        state.animatedValues.map { Pair(null, it) }
+        state.animatedValues.mapIndexed { index, value ->
+          TrayDieInstance(key = "anim_$index", type = null, value = value)
+        }
       } else if (state.currentRollResult != null) {
-        state.currentRollResult.rolls.map { Pair(it.diceType, it.value) }
+        state.currentRollResult.rolls.mapIndexed { index, roll ->
+          TrayDieInstance(key = roll.id, type = roll.diceType, value = roll.value)
+        }
       } else {
-        state.selectedDice.flatMap { (type, count) -> List(count) { Pair(type, 0) } }
+        val indexMap = mutableMapOf<DiceType, Int>()
+        state.selectedDice.flatMap { (type, count) ->
+          List(count) {
+            val index = indexMap.getOrDefault(type, 0)
+            indexMap[type] = index + 1
+            TrayDieInstance(key = "${type.name}_$index", type = type, value = 0)
+          }
+        }
       }
     }
 
@@ -119,18 +154,36 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        gridItems(itemsToDisplay) { (type, value) ->
-          Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        items(
+          items = itemsToDisplay,
+          key = { it.key }
+        ) { dieInstance ->
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .animateItem(),
+            contentAlignment = Alignment.Center,
+          ) {
             DieItem(
-              type = type,
-              value = value,
+              type = dieInstance.type,
+              value = dieInstance.value,
               isRolling = state.isRolling,
-              isHighlighted = type == highlightedDie,
-              onClick = type?.let { { onRemoveDie(it) } },
+              isHighlighted = dieInstance.type == highlightedDie,
+              onClick = dieInstance.type?.let { { onRemoveDie(it) } },
             )
           }
         }
       }
+    }
+  }
+}
+
+@Preview(name = "Die Item D20")
+@Composable
+fun DieItemPreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.padding(16.dp)) {
+      DieItem(type = DiceType.D20, value = 18, isRolling = false)
     }
   }
 }

@@ -342,8 +342,7 @@ fun MainScreenContent(
                     DiceSelectionCard(
                         type = type,
                         count = count,
-                        onAdd = { onAddDie(type) },
-                        onRemove = { onRemoveDie(type) }
+                        onAdd = { onAddDie(type) }
                     )
                 }
             }
@@ -528,8 +527,7 @@ fun DieItem(
 fun DiceSelectionCard(
     type: DiceType,
     count: Int,
-    onAdd: () -> Unit,
-    onRemove: () -> Unit
+    onAdd: () -> Unit
 ) {
     val color = Color(android.graphics.Color.parseColor(type.colorHex))
 
@@ -584,48 +582,7 @@ fun DiceSelectionCard(
                 modifier = Modifier.height(14.dp)
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onRemove,
-                    enabled = count > 0,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(24.dp)
-                        .background(
-                            if (count > 0) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
-                            RoundedCornerShape(6.dp)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove",
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-
-                IconButton(
-                    onClick = onAdd,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(24.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(6.dp)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add",
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
@@ -877,7 +834,7 @@ fun DieItemPreview() {
 fun DiceSelectionCardPreview() {
     DiceScrollTheme(darkTheme = true) {
         Box(modifier = Modifier.padding(16.dp)) {
-            DiceSelectionCard(type = DiceType.D8, count = 2, onAdd = {}, onRemove = {})
+            DiceSelectionCard(type = DiceType.D8, count = 2, onAdd = {})
         }
     }
 }

@@ -34,7 +34,7 @@ Goal: make the main rolling flow fast and readable during an active tabletop ses
 Tasks:
 
 * [x] Replace the horizontal dice pool with a grid that keeps all standard dice visible on typical phone screens.
-* [ ] Remove add/delete controls from dice pool cards.
+* [x] Remove add/delete controls from dice pool cards.
 * [ ] Add dice by tapping a die in the pool.
 * [ ] Remove a specific die by tapping it in the tray.
 * [ ] Add a basic pool-to-tray selection animation.

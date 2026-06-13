@@ -756,7 +756,7 @@ fun HistoryTabContent(
     onClearHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
 
     Column(
         modifier = modifier
@@ -1005,7 +1005,7 @@ fun HistoryItemPreview() {
                     ),
                     modifier = 2
                 ),
-                dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             )
         }
     }

@@ -60,7 +60,7 @@ Tasks:
 * [x] Persist roll history.
 * [x] Persist and restore the current tray state.
 * [x] Replace the history bottom sheet with a dedicated bottom navigation tab.
-* [ ] Show full local date and time for each roll.
+* [x] Show full local date and time for each roll.
 * [ ] Store roll history as immutable snapshots of the dice definitions used at roll time.
 * [ ] Support rerolling from history by executing the stored snapshot, not a mutable current definition.
 

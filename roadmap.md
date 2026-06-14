@@ -46,7 +46,7 @@ Tasks:
   * Preserve the current top-tabs navigation model.
   * Use Compose animation primitives that remain reliable across screen sizes.
 
-* [ ] Make the empty tray state explicit.
+* [x] Make the empty tray state explicit.
   * If no tray has been saved, start with an empty tray.
   * Keep restored persisted tray state when saved data exists.
   * Remove implicit default `1D6` behavior from default UI state and in-memory test repository where it creates fake initial dice.

@@ -9,6 +9,7 @@ import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
 import kotlin.random.Random
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -166,7 +167,7 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
   private suspend fun animateRoll(faces: List<Int>) {
     repeat(ROLL_ANIMATION_STEPS) { step ->
       _animatedValues.value = faces.map { faceCount -> faceCount.randomDieValue() }
-      delay(ROLL_ANIMATION_BASE_DELAY_MS + step * ROLL_ANIMATION_DELAY_STEP_MS)
+      delay((ROLL_ANIMATION_BASE_DELAY_MS + step * ROLL_ANIMATION_DELAY_STEP_MS).milliseconds)
     }
   }
 

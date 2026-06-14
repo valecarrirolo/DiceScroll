@@ -59,7 +59,7 @@ Tasks:
   * Tapping a die in the tray removes exactly one die of that type without affecting unrelated dice.
   * Preserve roll-result rendering after a roll and snapshot reroll behavior from history.
 
-* [ ] Add targeted pool-to-tray and tray-to-pool motion.
+* [x] Add targeted pool-to-tray and tray-to-pool motion.
   * Use robust Compose motion, not fragile pixel-perfect coordinate tracking.
   * Animate source pool-card feedback when adding a die.
   * Animate tray item insertion with stable keys, scale/fade, and `animateItem`.

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -249,8 +248,7 @@ fun DieItem(
       animationModifier
         .scale(highlightScale)
         .padding(4.dp)
-        .width(68.dp)
-        .height(78.dp)
+        .size(72.dp)
         .clip(RoundedCornerShape(14.dp))
         .background(color.copy(alpha = 0.15f))
         .border(2.dp, color, RoundedCornerShape(14.dp))

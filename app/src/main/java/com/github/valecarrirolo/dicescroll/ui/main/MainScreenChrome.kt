@@ -64,7 +64,7 @@ internal fun MainTopBar(onClearTray: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(TopBarTitleGap),
       ) {
         Image(
-          painter = painterResource(id = R.mipmap.ic_launcher),
+          painter = painterResource(id = R.drawable.ic_launcher_foreground),
           contentDescription = "DiceScroll Logo",
           modifier = Modifier.size(TopBarLogoSize).clip(RoundedCornerShape(TopBarLogoRadius)),
         )

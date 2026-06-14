@@ -84,7 +84,7 @@ class DefaultDataRepository(context: Context) : DataRepository {
 
 class InMemoryDataRepository : DataRepository {
   private val _rollHistory = MutableStateFlow<List<RollResult>>(emptyList())
-  private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(mapOf(DiceType.D6 to 1))
+  private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(emptyMap())
   private val _modifier = MutableStateFlow(0)
   override val rollHistory: Flow<List<RollResult>> = _rollHistory.asStateFlow()
   override val selectedDice: Flow<Map<DiceType, Int>> = _selectedDice.asStateFlow()

@@ -1,8 +1,10 @@
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -46,24 +49,39 @@ fun DiceSelectionCardPreview() {
 fun DiceSelectionCard(
   type: DiceType,
   count: Int,
-  isRecentlyAdded: Boolean = false,
   onAdd: () -> Unit,
+  modifier: Modifier = Modifier,
+  isRecentlyAdded: Boolean = false,
+  isRecentlyRemoved: Boolean = false,
 ) {
   val color = Color(type.colorHex.toColorInt())
   val cardScale by
     animateFloatAsState(
-      targetValue = if (isRecentlyAdded) 1.06f else 1f,
+      targetValue =
+        when {
+          isRecentlyAdded -> 1.08f
+          isRecentlyRemoved -> 0.94f
+          else -> 1f
+        },
       animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
       label = "DicePoolSelection",
     )
+  val returnOffset by
+    animateDpAsState(
+      targetValue = if (isRecentlyRemoved) (-8).dp else 0.dp,
+      animationSpec = tween(MainMotion.DICE_FEEDBACK_MILLIS),
+      label = "DicePoolReturnOffset",
+    )
 
   Box(
-    modifier = Modifier.padding(top = 10.dp, end = 10.dp)
+    modifier =
+      modifier.padding(top = 10.dp, end = 10.dp).offset {
+        IntOffset(x = 0, y = returnOffset.roundToPx())
+      }
   ) {
     Card(
       modifier =
-        Modifier
-          .size(72.dp) // Perfect square die
+        Modifier.size(72.dp)
           .scale(cardScale)
           .clickable { onAdd() }
           .border(
@@ -82,16 +100,13 @@ fun DiceSelectionCard(
             }
         ),
     ) {
-      Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-      ) {
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
           text = type.displayName,
           fontWeight = FontWeight.ExtraBold,
           color = if (count > 0) color else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
           fontSize = 20.sp,
-          textAlign = TextAlign.Center
+          textAlign = TextAlign.Center,
         )
       }
     }
@@ -102,10 +117,7 @@ fun DiceSelectionCard(
         color = color,
         contentColor = Color.White,
         shadowElevation = 6.dp,
-        modifier = Modifier
-          .size(24.dp)
-          .align(Alignment.TopEnd)
-          .offset(x = 8.dp, y = (-8).dp)
+        modifier = Modifier.size(24.dp).align(Alignment.TopEnd).offset(x = 8.dp, y = (-8).dp),
       ) {
         Box(contentAlignment = Alignment.Center) {
           Text(
@@ -113,7 +125,7 @@ fun DiceSelectionCard(
             fontSize = 11.sp,
             fontWeight = FontWeight.Black,
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
           )
         }
       }

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -58,5 +59,19 @@ class MainScreenTest {
     composeTestRule.onNodeWithContentDescription("Clear Tray").performClick()
 
     composeTestRule.onNodeWithText("SELECT DICE").assertIsNotEnabled()
+  }
+
+  @Test
+  fun dicePool_addsAndRemovesMatchingTrayDice() {
+    composeTestRule.onNodeWithContentDescription("Clear Tray").performClick()
+
+    composeTestRule.onNodeWithTag("pool-D4").performClick()
+    composeTestRule.onAllNodesWithTag("tray-die-D4").assertCountEquals(1)
+
+    composeTestRule.onNodeWithTag("pool-D4").performClick()
+    composeTestRule.onAllNodesWithTag("tray-die-D4").assertCountEquals(2)
+
+    composeTestRule.onAllNodesWithTag("tray-die-D4")[0].performClick()
+    composeTestRule.onAllNodesWithTag("tray-die-D4").assertCountEquals(1)
   }
 }

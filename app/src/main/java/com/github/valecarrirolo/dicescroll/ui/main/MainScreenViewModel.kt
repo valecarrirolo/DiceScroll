@@ -30,10 +30,7 @@ data class DiceUiState(
 
 class MainScreenViewModel(private val repository: DataRepository) : ViewModel() {
 
-  private val _selectedDice =
-    MutableStateFlow<Map<DiceType, Int>>(
-      mapOf(DiceType.D6 to 1) // default to 1 D6
-    )
+  private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(emptyMap())
   private val _modifier = MutableStateFlow(0)
   private val _isRolling = MutableStateFlow(false)
   private val _currentRollResult = MutableStateFlow<RollResult?>(null)
@@ -142,6 +139,7 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
 
   private fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
     _selectedDice.value = selectedDice
+    _currentRollResult.value = null
     viewModelScope.launch { repository.setSelectedDice(selectedDice) }
   }
 

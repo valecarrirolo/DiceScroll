@@ -2,6 +2,7 @@ package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,8 +18,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
@@ -57,6 +62,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -209,13 +215,21 @@ fun MainScreenContent(
   onRerollHistory: (RollResult) -> Unit = {},
 ) {
   var recentlyAddedDie by remember { mutableStateOf<DiceType?>(null) }
+  var recentlyRemovedDie by remember { mutableStateOf<DiceType?>(null) }
   var modifierEnabled by remember { mutableStateOf(true) }
   var showModifierSheet by remember { mutableStateOf(false) }
 
   LaunchedEffect(recentlyAddedDie) {
     if (recentlyAddedDie != null) {
-      delay(DICE_HIGHLIGHT_DURATION_MS)
+      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS)
       recentlyAddedDie = null
+    }
+  }
+
+  LaunchedEffect(recentlyRemovedDie) {
+    if (recentlyRemovedDie != null) {
+      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS)
+      recentlyRemovedDie = null
     }
   }
 
@@ -243,18 +257,29 @@ fun MainScreenContent(
         state = state,
         onClearHistory = onClearHistory,
         onReroll = onRerollHistory,
-        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 12.dp),
+        modifier =
+          Modifier.fillMaxSize()
+            .padding(innerPadding)
+            .padding(horizontal = 16.dp)
+            .navigationBarsPadding(),
       )
     } else {
       Column(
-        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 12.dp),
+        modifier =
+          Modifier.fillMaxSize()
+            .padding(innerPadding)
+            .padding(horizontal = 16.dp)
+            .navigationBarsPadding(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
       ) {
         TrayPanel(
           state = state,
           highlightedDie = recentlyAddedDie,
-          onRemoveDie = onRemoveDie,
+          onRemoveDie = { type ->
+            recentlyRemovedDie = type
+            onRemoveDie(type)
+          },
           modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 8.dp, bottom = 10.dp),
         )
 
@@ -270,6 +295,7 @@ fun MainScreenContent(
         DicePool(
           state = state,
           recentlyAddedDie = recentlyAddedDie,
+          recentlyRemovedDie = recentlyRemovedDie,
           onAddDie = { type ->
             recentlyAddedDie = type
             onAddDie(type)
@@ -290,7 +316,6 @@ private fun MainTopBar(onClearTray: () -> Unit) {
         fontWeight = FontWeight.ExtraBold,
         fontFamily = FontFamily.Monospace,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 4.dp),
       )
     },
     actions = {
@@ -313,35 +338,49 @@ private fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
     shape = RoundedCornerShape(18.dp),
     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
   ) {
-    Row(modifier = Modifier.padding(3.dp).testTag("main-tabs")) {
-      MainTab.values().forEach { tab ->
-        val selected = selectedTab == tab
-        Box(
-          modifier =
-            Modifier.weight(1f)
-              .clip(RoundedCornerShape(15.dp))
-              .background(
+    val tabs = MainTab.values()
+    BoxWithConstraints(modifier = Modifier.padding(3.dp).testTag("main-tabs")) {
+      val selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0)
+      val indicatorWidth = maxWidth / tabs.size
+      val indicatorOffset by
+        animateDpAsState(
+          targetValue = indicatorWidth * selectedIndex.toFloat(),
+          animationSpec = tween(MainMotion.TAB_INDICATOR_MILLIS),
+          label = "MainTabIndicator",
+        )
+
+      Box(
+        modifier =
+          Modifier.offset { IntOffset(x = indicatorOffset.roundToPx(), y = 0) }
+            .width(indicatorWidth)
+            .height(34.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(Brush.linearGradient(colors = listOf(NeonPurple, NeonTeal)))
+      )
+
+      Row {
+        tabs.forEach { tab ->
+          val selected = selectedTab == tab
+          Box(
+            modifier =
+              Modifier.weight(1f)
+                .clip(RoundedCornerShape(15.dp))
+                .clickable { onTabSelected(tab) }
+                .padding(vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+          ) {
+            Text(
+              text = tab.name,
+              fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+              fontSize = 13.sp,
+              color =
                 if (selected) {
-                  Brush.linearGradient(colors = listOf(NeonPurple, NeonTeal))
+                  Color.White
                 } else {
-                  Brush.linearGradient(colors = listOf(Color.Transparent, Color.Transparent))
-                }
-              )
-              .clickable { onTabSelected(tab) }
-              .padding(vertical = 8.dp),
-          contentAlignment = Alignment.Center,
-        ) {
-          Text(
-            text = tab.name,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
-            fontSize = 13.sp,
-            color =
-              if (selected) {
-                Color.White
-              } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-              },
-          )
+                  MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+          }
         }
       }
     }
@@ -445,7 +484,7 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
   Button(
     onClick = {
       coroutineScope.launch {
-        buttonScale.animateTo(0.92f, animationSpec = tween(100))
+        buttonScale.animateTo(0.92f, animationSpec = tween(MainMotion.ROLL_BUTTON_PRESS_MILLIS))
         buttonScale.animateTo(
           1f,
           animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -499,6 +538,7 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
 private fun DicePool(
   state: DiceUiState,
   recentlyAddedDie: DiceType?,
+  recentlyRemovedDie: DiceType?,
   onAddDie: (DiceType) -> Unit,
 ) {
   Text(
@@ -513,7 +553,8 @@ private fun DicePool(
 
   LazyVerticalGrid(
     columns = GridCells.Adaptive(minSize = 76.dp),
-    modifier = Modifier.fillMaxWidth().height(144.dp).padding(bottom = 10.dp),
+    modifier = Modifier.fillMaxWidth().height(184.dp),
+    contentPadding = PaddingValues(bottom = 8.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp),
     userScrollEnabled = false,
@@ -523,10 +564,10 @@ private fun DicePool(
         type = type,
         count = state.selectedDice[type] ?: 0,
         isRecentlyAdded = recentlyAddedDie == type,
+        isRecentlyRemoved = recentlyRemovedDie == type,
+        modifier = Modifier.testTag("pool-${type.name}"),
         onAdd = { onAddDie(type) },
       )
     }
   }
 }
-
-private const val DICE_HIGHLIGHT_DURATION_MS = 260L

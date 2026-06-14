@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -100,8 +101,9 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
       AnimatedContent(
         targetState = Pair(state.isRolling, state.currentRollResult),
         transitionSpec = {
-          fadeIn(animationSpec = tween(220, delayMillis = 90)) togetherWith
-            fadeOut(animationSpec = tween(90))
+          fadeIn(
+            animationSpec = tween(MainMotion.TOTAL_FADE_IN_MILLIS, delayMillis = 90)
+          ) togetherWith fadeOut(animationSpec = tween(MainMotion.TOTAL_FADE_OUT_MILLIS))
         },
         label = "TotalDisplay",
       ) { (rolling, result) ->
@@ -150,7 +152,10 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
       ) {
         items(items = itemsToDisplay, key = { it.key }) { dieInstance ->
           Box(
-            modifier = Modifier.fillMaxWidth().animateItem(),
+            modifier =
+              Modifier.fillMaxWidth()
+                .animateItem()
+                .testTag("tray-die-${dieInstance.type?.name ?: "ROLLING"}"),
             contentAlignment = Alignment.Center,
           ) {
             DieItem(
@@ -192,7 +197,7 @@ fun DieItem(
       targetValue = 15f,
       animationSpec =
         infiniteRepeatable(
-          animation = tween(100, easing = LinearEasing),
+          animation = tween(MainMotion.SHAKE_MILLIS, easing = LinearEasing),
           repeatMode = RepeatMode.Reverse,
         ),
       label = "ShakeRotate",
@@ -204,7 +209,7 @@ fun DieItem(
       targetValue = 1.1f,
       animationSpec =
         infiniteRepeatable(
-          animation = tween(100, easing = LinearEasing),
+          animation = tween(MainMotion.SHAKE_MILLIS, easing = LinearEasing),
           repeatMode = RepeatMode.Reverse,
         ),
       label = "ShakeScale",

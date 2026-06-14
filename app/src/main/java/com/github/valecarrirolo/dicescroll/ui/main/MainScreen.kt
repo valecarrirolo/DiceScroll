@@ -58,6 +58,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.github.valecarrirolo.dicescroll.R
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -74,6 +80,7 @@ import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
 
 enum class MainTab {
@@ -221,14 +228,14 @@ fun MainScreenContent(
 
   LaunchedEffect(recentlyAddedDie) {
     if (recentlyAddedDie != null) {
-      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS)
+      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS.milliseconds)
       recentlyAddedDie = null
     }
   }
 
   LaunchedEffect(recentlyRemovedDie) {
     if (recentlyRemovedDie != null) {
-      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS)
+      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS.milliseconds)
       recentlyRemovedDie = null
     }
   }
@@ -264,43 +271,98 @@ fun MainScreenContent(
             .navigationBarsPadding(),
       )
     } else {
-      Column(
-        modifier =
-          Modifier.fillMaxSize()
-            .padding(innerPadding)
-            .padding(horizontal = 16.dp)
-            .navigationBarsPadding(),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-      ) {
-        TrayPanel(
-          state = state,
-          highlightedDie = recentlyAddedDie,
-          onRemoveDie = { type ->
-            recentlyRemovedDie = type
-            onRemoveDie(type)
-          },
-          modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 8.dp, bottom = 10.dp),
-        )
+      val configuration = LocalConfiguration.current
+      val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        RollControls(
-          state = state,
-          modifierEnabled = modifierEnabled,
-          onModifierClick = { showModifierSheet = true },
-          onRoll = onRoll,
-        )
+      if (isLandscape) {
+        Row(
+          modifier =
+            Modifier.fillMaxSize()
+              .padding(innerPadding)
+              .padding(horizontal = 16.dp)
+              .navigationBarsPadding(),
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          TrayPanel(
+            state = state,
+            highlightedDie = recentlyAddedDie,
+            onRemoveDie = { type ->
+              recentlyRemovedDie = type
+              onRemoveDie(type)
+            },
+            modifier = Modifier.weight(1f).fillMaxHeight().padding(vertical = 8.dp),
+          )
 
-        Spacer(modifier = Modifier.height(12.dp))
+          Column(
+            modifier = Modifier.weight(1.2f).fillMaxHeight().padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
+            RollControls(
+              state = state,
+              modifierEnabled = modifierEnabled,
+              onModifierClick = { showModifierSheet = true },
+              onRoll = onRoll,
+            )
 
-        DicePool(
-          state = state,
-          recentlyAddedDie = recentlyAddedDie,
-          recentlyRemovedDie = recentlyRemovedDie,
-          onAddDie = { type ->
-            recentlyAddedDie = type
-            onAddDie(type)
-          },
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DicePool(
+              state = state,
+              recentlyAddedDie = recentlyAddedDie,
+              recentlyRemovedDie = recentlyRemovedDie,
+              onAddDie = { type ->
+                recentlyAddedDie = type
+                onAddDie(type)
+              },
+              modifier = Modifier.fillMaxWidth().weight(1f),
+              gridModifier = Modifier.weight(1f),
+              scrollEnabled = true,
+            )
+          }
+        }
+      } else {
+        Column(
+          modifier =
+            Modifier.fillMaxSize()
+              .padding(innerPadding)
+              .padding(horizontal = 16.dp)
+              .navigationBarsPadding(),
+          verticalArrangement = Arrangement.SpaceBetween,
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          TrayPanel(
+            state = state,
+            highlightedDie = recentlyAddedDie,
+            onRemoveDie = { type ->
+              recentlyRemovedDie = type
+              onRemoveDie(type)
+            },
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 8.dp, bottom = 10.dp),
+          )
+
+          RollControls(
+            state = state,
+            modifierEnabled = modifierEnabled,
+            onModifierClick = { showModifierSheet = true },
+            onRoll = onRoll,
+          )
+
+          Spacer(modifier = Modifier.height(12.dp))
+
+          DicePool(
+            state = state,
+            recentlyAddedDie = recentlyAddedDie,
+            recentlyRemovedDie = recentlyRemovedDie,
+            onAddDie = { type ->
+              if (state.totalDiceCount < 12) {
+                recentlyAddedDie = type
+                onAddDie(type)
+              }
+            },
+          )
+        }
       }
     }
   }
@@ -311,12 +373,24 @@ fun MainScreenContent(
 private fun MainTopBar(onClearTray: () -> Unit) {
   TopAppBar(
     title = {
-      Text(
-        text = "DiceScroll",
-        fontWeight = FontWeight.ExtraBold,
-        fontFamily = FontFamily.Monospace,
-        color = MaterialTheme.colorScheme.primary,
-      )
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+      ) {
+        Image(
+          painter = painterResource(id = R.mipmap.ic_launcher),
+          contentDescription = "DiceScroll Logo",
+          modifier = Modifier
+            .size(32.dp)
+            .clip(RoundedCornerShape(8.dp)),
+        )
+        Text(
+          text = "DiceScroll",
+          fontWeight = FontWeight.ExtraBold,
+          fontFamily = FontFamily.Monospace,
+          color = MaterialTheme.colorScheme.primary,
+        )
+      }
     },
     actions = {
       IconButton(onClick = onClearTray) {
@@ -338,7 +412,7 @@ private fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
     shape = RoundedCornerShape(18.dp),
     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
   ) {
-    val tabs = MainTab.values()
+    val tabs = MainTab.entries
     BoxWithConstraints(modifier = Modifier.padding(3.dp).testTag("main-tabs")) {
       val selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0)
       val indicatorWidth = maxWidth / tabs.size
@@ -540,34 +614,39 @@ private fun DicePool(
   recentlyAddedDie: DiceType?,
   recentlyRemovedDie: DiceType?,
   onAddDie: (DiceType) -> Unit,
+  modifier: Modifier = Modifier,
+  gridModifier: Modifier = Modifier.height(184.dp),
+  scrollEnabled: Boolean = false,
 ) {
-  Text(
-    text = "Dice Pool",
-    fontWeight = FontWeight.SemiBold,
-    fontSize = 14.sp,
-    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-    modifier = Modifier.fillMaxWidth(),
-  )
+  Column(modifier = modifier) {
+    Text(
+      text = "Dice Pool",
+      fontWeight = FontWeight.SemiBold,
+      fontSize = 14.sp,
+      color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+      modifier = Modifier.fillMaxWidth(),
+    )
 
-  Spacer(modifier = Modifier.height(6.dp))
+    Spacer(modifier = Modifier.height(6.dp))
 
-  LazyVerticalGrid(
-    columns = GridCells.Adaptive(minSize = 76.dp),
-    modifier = Modifier.fillMaxWidth().height(184.dp),
-    contentPadding = PaddingValues(bottom = 8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    userScrollEnabled = false,
-  ) {
-    gridItems(DiceType.values()) { type ->
-      DiceSelectionCard(
-        type = type,
-        count = state.selectedDice[type] ?: 0,
-        isRecentlyAdded = recentlyAddedDie == type,
-        isRecentlyRemoved = recentlyRemovedDie == type,
-        modifier = Modifier.testTag("pool-${type.name}"),
-        onAdd = { onAddDie(type) },
-      )
+    LazyVerticalGrid(
+      columns = GridCells.Adaptive(minSize = 76.dp),
+      modifier = gridModifier.fillMaxWidth(),
+      contentPadding = PaddingValues(bottom = 8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      userScrollEnabled = scrollEnabled,
+    ) {
+      gridItems(DiceType.entries) { type ->
+        DiceSelectionCard(
+          type = type,
+          count = state.selectedDice[type] ?: 0,
+          isRecentlyAdded = recentlyAddedDie == type,
+          isRecentlyRemoved = recentlyRemovedDie == type,
+          modifier = Modifier.testTag("pool-${type.name}"),
+          onAdd = { onAddDie(type) },
+        )
+      }
     }
   }
 }

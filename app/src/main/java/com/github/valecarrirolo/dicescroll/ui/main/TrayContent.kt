@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -71,7 +72,7 @@ fun TrayContentPreview() {
 @Composable
 fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (DiceType) -> Unit) {
   val itemsToDisplay =
-    remember(state.isRolling, state.animatedValues, state.currentRollResult) {
+    remember(state.isRolling, state.animatedValues, state.currentRollResult, state.selectedDice) {
       if (state.isRolling) {
         state.animatedValues.mapIndexed { index, value ->
           TrayDieInstance(key = "anim_$index", type = null, value = value)
@@ -97,7 +98,7 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
     verticalArrangement = Arrangement.SpaceBetween,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Box(modifier = Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxWidth().height(66.dp), contentAlignment = Alignment.Center) {
       AnimatedContent(
         targetState = Pair(state.isRolling, state.currentRollResult),
         transitionSpec = {
@@ -144,11 +145,12 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
 
     Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
       LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 68.dp),
+        columns = GridCells.Adaptive(minSize = 76.dp),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(4.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
+        userScrollEnabled = false,
       ) {
         items(items = itemsToDisplay, key = { it.key }) { dieInstance ->
           Box(
@@ -247,7 +249,8 @@ fun DieItem(
       animationModifier
         .scale(highlightScale)
         .padding(4.dp)
-        .size(58.dp)
+        .width(68.dp)
+        .height(78.dp)
         .clip(RoundedCornerShape(14.dp))
         .background(color.copy(alpha = 0.15f))
         .border(2.dp, color, RoundedCornerShape(14.dp))
@@ -256,11 +259,11 @@ fun DieItem(
   ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
       if (type != null) {
-        Text(text = type.displayName, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = color)
+        Text(text = type.displayName, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = color)
       }
       Text(
         text = if (value > 0) "$value" else "?",
-        fontSize = 21.sp,
+        fontSize = 28.sp,
         fontWeight = FontWeight.Black,
         fontFamily = FontFamily.Monospace,
         color =

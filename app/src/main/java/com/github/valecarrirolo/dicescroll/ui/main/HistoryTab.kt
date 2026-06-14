@@ -137,50 +137,66 @@ fun HistoryItem(
         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
       ),
   ) {
-    Row(
-      modifier = Modifier.fillMaxWidth().padding(12.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
+    Column(
+      modifier = Modifier.fillMaxWidth().padding(14.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-          Text(text = diceSummary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-          if (roll.modifier != 0) {
-            Text(
-              text = "(${if (roll.modifier > 0) "+" else ""}${roll.modifier})",
-              fontSize = 12.sp,
-              color = NeonTeal,
-              fontWeight = FontWeight.Bold,
-            )
-          }
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
+      ) {
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+          Text(text = diceSummary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+          Text(
+            text = "Setup",
+            fontSize = 11.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.45f),
+          )
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        val rollsDetail = remember(roll.rolls) { roll.rolls.map { it.value }.joinToString(", ") }
         Text(
-          text = "Rolls: [$rollsDetail]",
-          fontSize = 12.sp,
-          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+          text = timeStr,
+          fontSize = 11.sp,
+          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.45f),
+          textAlign = TextAlign.End,
         )
       }
 
-      Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
-        Text(
-          text = "= ${roll.total}",
-          fontWeight = FontWeight.Black,
-          fontSize = 20.sp,
-          fontFamily = FontFamily.Monospace,
-          color = NeonTeal,
-        )
-        Text(
-          text = timeStr,
-          fontSize = 10.sp,
-          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-        )
+      val rollsDetail = remember(roll.rolls) { roll.rolls.map { it.value }.joinToString(", ") }
+      Text(
+        text =
+          if (roll.modifier == 0) {
+            "Values: $rollsDetail"
+          } else {
+            "Values: $rollsDetail   Modifier: ${if (roll.modifier > 0) "+" else ""}${roll.modifier}"
+          },
+        fontSize = 12.sp,
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.68f),
+      )
+
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Row(
+          verticalAlignment = Alignment.Bottom,
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+          Text(
+            text = "${roll.total}",
+            fontWeight = FontWeight.Black,
+            fontSize = 28.sp,
+            fontFamily = FontFamily.Monospace,
+            color = NeonTeal,
+          )
+          Text(
+            text = "total",
+            fontSize = 11.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.48f),
+            modifier = Modifier.padding(bottom = 5.dp),
+          )
+        }
         TextButton(onClick = { onReroll(roll) }) {
           Icon(
             imageVector = Icons.Default.Refresh,
@@ -188,7 +204,7 @@ fun HistoryItem(
             modifier = Modifier.size(14.dp),
           )
           Spacer(modifier = Modifier.width(4.dp))
-          Text("Reroll", fontSize = 11.sp)
+          Text("Reroll", fontSize = 12.sp)
         }
       }
     }

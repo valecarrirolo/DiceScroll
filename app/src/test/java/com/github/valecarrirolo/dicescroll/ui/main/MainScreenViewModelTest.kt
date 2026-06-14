@@ -32,12 +32,12 @@ class MainScreenViewModelTest {
   }
 
   @Test
-  fun uiState_initialState_hasOneD6() = runTest {
+  fun uiState_initialState_hasEmptyTray() = runTest {
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
     testScheduler.advanceUntilIdle()
     val state = viewModel.uiState.value
-    assertEquals(1, state.selectedDice[DiceType.D6])
-    assertEquals(1, state.totalDiceCount)
+    assertTrue(state.selectedDice.isEmpty())
+    assertEquals(0, state.totalDiceCount)
   }
 
   @Test
@@ -47,7 +47,7 @@ class MainScreenViewModelTest {
     testScheduler.advanceUntilIdle()
     val state = viewModel.uiState.value
     assertEquals(1, state.selectedDice[DiceType.D20])
-    assertEquals(2, state.totalDiceCount)
+    assertEquals(1, state.totalDiceCount)
   }
 
   @Test
@@ -58,12 +58,14 @@ class MainScreenViewModelTest {
     testScheduler.advanceUntilIdle()
     val state = viewModel.uiState.value
     assertTrue(state.selectedDice[DiceType.D20] == null)
-    assertEquals(1, state.totalDiceCount)
+    assertEquals(0, state.totalDiceCount)
   }
 
   @Test
   fun rollTray_generatesResultsAndLogsHistory() = runTest {
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
+    viewModel.addDie(DiceType.D6)
+    testScheduler.advanceUntilIdle()
     viewModel.rollTray()
     // Advance time to complete the roll animation delay loop
     testScheduler.advanceUntilIdle()
@@ -77,6 +79,7 @@ class MainScreenViewModelTest {
   @Test
   fun rerollFromHistory_usesSnapshotAndLogsHistory() = runTest {
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
+    viewModel.addDie(DiceType.D6)
     viewModel.addDie(DiceType.D20)
     viewModel.setModifier(3)
     testScheduler.advanceUntilIdle()

@@ -1,43 +1,35 @@
 # DiceScroll Roadmap
 
-DiceScroll is a Jetpack Compose Android dice roller optimized for tabletop sessions: fast tray building, readable dice, reliable local history, and a rolling flow that stays usable during play.
+## Vision
 
-This document has three sections:
+DiceScroll is a focused tabletop dice tray for Android: fast to use during play, easy to read at a glance, reliable across app restarts, and satisfying without becoming a full RPG character-sheet tool.
 
-* **Current Baseline**: the product and technical state the roadmap starts from.
-* **Active Roadmap**: committed tasks to implement next.
-* **Nice to Have Backlog**: detailed ideas that are not scheduled yet.
+The main experience should feel like preparing and rolling dice on a real table:
 
----
+* choose dice quickly from a clear pool;
+* see only the dice currently in the tray;
+* roll without distractions;
+* review and reroll previous results safely;
+* keep the interface readable on common phone screens.
 
-## Current Baseline
+## Guardrails
 
-The app already has a Compose/Material 3 main screen, a ViewModel-driven tray, standard dice (`D4`, `D6`, `D8`, `D10`, `D12`, `D20`, `D100`), roll animation, modifiers, haptics, Room persistence, restored tray state, persisted roll history, snapshot-based reroll, a dedicated History tab, and a visible dice pool grid.
-
-Completed milestone outcomes:
-
-* `v0.2 - Tabletop Tray UX`: grid dice pool, tap-to-add, tap-tray-to-remove, responsive tray layout, basic selection feedback, and compact modifier access.
-* `v0.3 - Local Persistence and History Tab`: Room storage, restored tray state, persisted history, timestamps, roll snapshots, and snapshot-based history reroll.
-
-Remaining implementation gaps:
-
-* `DiceType` is still an enum, so it cannot represent user-created dice without a future model change.
-* The top title row, tabs, and system inset handling need alignment and edge-to-edge polish.
-* The Roller/History tab change is currently too abrupt and needs a smooth moving indicator.
-* A fresh app state should show an empty tray, not an unexplained default die.
-* Tray motion should clearly show dice moving into and out of the active tray.
-* The dice pool can still look clipped on small screens and needs final readability tuning.
-* History rows need a cleaner layout for setup, values, total, timestamp, and reroll action.
+* Keep the rolling flow tray-first: the tray, dice pool, roll button, and history must support fast tabletop use.
+* Prefer clear numeric readability over decorative dice visuals.
+* Keep local persistence reliable before adding connected or account-based features.
+* History must stay snapshot-based so old rolls and rerolls remain correct even if dice definitions change later.
+* Do not turn DiceScroll into a full RPG sheet manager; saved dice trays and RPG character integrations are separate concepts.
+* Avoid UI that hides core actions behind too many taps during play.
+* Use motion to explain interactions, not as decoration.
+* Keep implementation changes scoped to the current product surface unless a data-model change is explicitly promoted.
 
 ---
 
-## Active Roadmap
+## Things We Want To Do
 
-Only the milestones in this section are committed work.
+### Interaction Polish and Layout Correctness
 
-### v0.4 - Interaction Polish and Layout Correctness
-
-Goal: make the current roller and history experience feel deliberate, readable, and stable on common Android phone layouts before adding larger product features.
+Goal: make the current roller and history experience feel deliberate, readable, and stable on common Android phone layouts.
 
 Tasks:
 
@@ -51,7 +43,7 @@ Tasks:
 * [ ] Animate the Roller/History tabs.
   * Replace the instant selected-state jump with a smooth moving indicator.
   * Keep both labels stable, readable, and tappable while the indicator moves.
-  * Preserve the current top-tabs navigation model; do not restore bottom navigation.
+  * Preserve the current top-tabs navigation model.
   * Use Compose animation primitives that remain reliable across screen sizes.
 
 * [ ] Make the empty tray state explicit.
@@ -114,107 +106,81 @@ Verification:
 
 ---
 
-## Nice to Have Backlog
+## Things We Are Not Doing Now
 
-Items in this section are not committed roadmap work. They should stay here until explicitly promoted into the Active Roadmap.
+These ideas are intentionally out of the active roadmap. Some may become future work, but they should not distract from the current rolling experience.
 
-### Future: Custom Numeric Dice and Saved Trays
+### Custom Numeric Dice and Saved Tray Presets
 
-Why it matters: players can create reusable tabletop tools without needing RPG-sheet integration.
+Status: later, after the current tray interaction is stable.
 
-Potential work:
+Why not now:
 
-* Replace or extend the enum-based dice model with a flexible dice definition model.
-* Support standard and user-created numeric dice through the same rolling pipeline.
-* Add an expert custom dice section with name, face count, and color fields.
-* Validate custom numeric dice before saving.
-* Add saved tray presets for reusable dice combinations and modifiers.
-* Keep RPG character sheets separate from saved tray presets.
+* The current `DiceType` enum needs a flexible dice definition model before custom dice are clean.
+* Custom dice should not be bolted onto the current UI until the standard dice flow is polished.
+* Saved tray presets are useful, but they should build on a stable tray model and not replace the immediate tabletop flow.
 
-Future design notes:
+Future notes:
 
 * `DiceDefinition`: stable id, display name, face count, color, standard/custom kind, and optional skin reference.
 * `SavedTray`: stable id, name, selected dice definitions or snapshots, quantities, and modifier state.
-* History must remain snapshot-based so old rolls stay correct after custom dice are edited or deleted.
 
-### Future: Basic Aggregate Stats
+### Stats and Analysis
 
-Why it matters: players can review useful roll summaries from reliable local history.
+Status: later, after the main history UI is easier to scan.
 
-Potential work:
+Why not now:
 
-* Show total roll count.
-* Show rolls by die type.
-* Show average total, minimum total, and maximum total.
-* Support standard dice, future custom dice, modifiers, and empty history states.
-* Keep this secondary to the main rolling workflow.
+* Basic stats depend on history being readable and trusted first.
+* Advanced charts and probability analysis are secondary to fast rolling.
+* Clearing history and future custom dice must have clear behavior before stats are promoted.
 
-Future design notes:
+### Dice Skins and Visual Customization
 
-* Stats should be computed from persisted history.
-* Clearing history should reset aggregate stats.
-* Advanced distribution charts and probability visualizations should remain separate from basic aggregates.
+Status: later, after a flexible dice definition model exists.
 
-### Future: Dice Skins and Visual Customization
+Why not now:
 
-Why it matters: skins can make dice more personal once the data model is stable.
+* Skins can make dice harder to read if introduced too early.
+* Visual customization should remain metadata, not part of roll correctness.
+* Old history entries must still render correctly if skins change or disappear.
 
-Potential work:
+### Sound, Wake Lock, Widgets, and Quick Access
 
-* Add per-die skins after `DiceDefinition` exists.
-* Support textures, fonts, edge styles, and visual themes.
-* Keep skins optional so numeric readability remains the default.
-* Avoid coupling skins to roll correctness or history storage.
+Status: parked.
 
-Future design notes:
+Why not now:
 
-* Skin references should be metadata on dice definitions, not part of roll result math.
-* Old history entries should render correctly even if a skin is removed or changed.
+* Sound and wake lock are nice session features, but they do not fix current layout and interaction issues.
+* Widgets and Quick Settings tiles should reuse a stable rolling engine and saved tray model.
+* These features should remain optional and easy to disable.
 
-### Future: Advanced Analysis
+### Connected Play and RPG Character Integration
 
-Why it matters: advanced analysis can help players inspect long-term rolling patterns.
+Status: explicitly not part of the current product direction.
 
-Potential work:
+Why not now:
 
-* Add distribution charts.
-* Add trend views and richer filters.
-* Add fairness summaries after enough persisted history exists.
-* Compare expected probability against observed history where mathematically useful.
+* Shared rooms, WebSockets, and multiplayer workflows add complexity before the local experience is fully polished.
+* RPG character integration can turn the app into a sheet manager, which is outside the current focus.
+* Character sheets should stay separate from generic saved tray presets.
 
-Future design notes:
+### Bottom Navigation
 
-* Advanced analysis depends on stable persisted roll snapshots.
-* Charting should not block the core roll/history workflow.
+Status: discarded for now.
 
-### Future: Sound, Wake Lock, and Quick Access
+Why not now:
 
-Why it matters: these improve the tabletop feel and reduce friction during sessions.
+* It took too much vertical space from the roller screen.
+* Top tabs better support the tray-first layout.
+* Reintroducing bottom navigation should require a clear need for more than two primary destinations.
 
-Potential work:
+### Pixel-Perfect Dice Travel Animation
 
-* Add sound profiles such as plastic on felt, metal on wood, or crystal chime.
-* Add a screen wake lock option for long sessions.
-* Add a home screen widget or Quick Settings tile for fast common rolls.
+Status: discarded for now.
 
-Future design notes:
+Why not now:
 
-* Sound should be optional and easy to disable.
-* Wake lock should be explicit, visible, and reversible.
-* Quick access should reuse the same rolling engine as the main app.
-
-### Future: Connected Play and RPG Integration
-
-Why it matters: remote or character-driven workflows can make DiceScroll useful beyond solo device rolling.
-
-Potential work:
-
-* Add shared rooms over local Wi-Fi or WebSockets.
-* Share a virtual dice tray with other players.
-* Add RPG character integration as a separate feature area from saved tray presets.
-* Import or model simple stats for checks and saves.
-
-Future design notes:
-
-* Connected play should not be started until the local roll model and persistence layer are stable.
-* RPG integration should not complicate the generic saved tray workflow.
+* Exact source-to-target coordinate tracking is more fragile across screen sizes and layout changes.
+* Targeted Compose motion is enough to communicate add/remove direction.
+* The app should stay responsive during repeated tabletop interactions.

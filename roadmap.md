@@ -66,7 +66,7 @@ Tasks:
   * Animate removal with clear reverse feedback so it feels like the die returns toward its source pool card.
   * Keep motion short enough for repeated tabletop use.
 
-* [ ] Fix dice pool readability and bottom clipping.
+* [x] Fix dice pool readability and bottom clipping.
   * Review fixed heights, bottom padding, and system inset interactions.
   * Ensure the pool is not cut off at the bottom on common portrait layouts.
   * Keep all seven standard dice readable with responsive cells.

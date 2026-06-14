@@ -73,7 +73,7 @@ Tasks:
   * Avoid text truncation inside dice cards.
   * Preserve tap-to-add behavior and selected-count badges.
 
-* [ ] Standardize app motion polish.
+* [x] Standardize app motion polish.
   * Define shared duration/easing constants for tab indicator, pool feedback, tray insertion/removal, roll button press, and history interactions.
   * Reduce abrupt jumps without making the app feel slow.
   * Keep haptic feedback aligned with meaningful roll state changes.

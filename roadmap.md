@@ -40,7 +40,7 @@ Tasks:
   * Align the title, clear action, and top tabs to the same horizontal rhythm.
   * Verify the status bar area blends with the app background instead of looking like a separate blocked strip.
 
-* [ ] Animate the Roller/History tabs.
+* [x] Animate the Roller/History tabs.
   * Replace the instant selected-state jump with a smooth moving indicator.
   * Keep both labels stable, readable, and tappable while the indicator moves.
   * Preserve the current top-tabs navigation model.

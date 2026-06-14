@@ -52,7 +52,7 @@ Tasks:
   * Remove implicit default `1D6` behavior from default UI state and in-memory test repository where it creates fake initial dice.
   * Keep the roll button disabled while the tray is empty.
 
-* [ ] Make tray contents match selected dice exactly.
+* [x] Make tray contents match selected dice exactly.
   * The tray must show only currently selected dice.
   * Tapping `D4` once in the pool shows exactly one `D4` in the tray.
   * Tapping `D4` again adds a second visible `D4`.

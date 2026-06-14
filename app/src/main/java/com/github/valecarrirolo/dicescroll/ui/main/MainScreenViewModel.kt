@@ -8,8 +8,8 @@ import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
 import kotlin.random.Random
-import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +37,22 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
   private val _currentRollResult = MutableStateFlow<RollResult?>(null)
   private val _animatedValues = MutableStateFlow<List<Int>>(emptyList())
 
+  private val rollerState =
+    combine(_selectedDice, _modifier, _isRolling, _currentRollResult, _animatedValues) {
+      selectedDice,
+      modifier,
+      isRolling,
+      currentRollResult,
+      animatedValues ->
+      DiceUiState(
+        selectedDice = selectedDice,
+        modifier = modifier,
+        isRolling = isRolling,
+        currentRollResult = currentRollResult,
+        animatedValues = animatedValues,
+      )
+    }
+
   init {
     viewModelScope.launch {
       repository.selectedDice.collect { selectedDice -> _selectedDice.value = selectedDice }
@@ -45,50 +61,21 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
   }
 
   val uiState: StateFlow<DiceUiState> =
-    combine(_selectedDice, _modifier, _isRolling, _currentRollResult, _animatedValues) {
-        selectedDice,
-        modifier,
-        isRolling,
-        currentRollResult,
-        animatedValues ->
-        DiceUiState(
-          selectedDice = selectedDice,
-          modifier = modifier,
-          isRolling = isRolling,
-          currentRollResult = currentRollResult,
-          animatedValues = animatedValues,
-        )
-      }
-      .let { rollerState ->
-        combine(rollerState, repository.rollHistory) { state, rollHistory ->
-          state.copy(rollHistory = rollHistory)
-        }
+    combine(rollerState, repository.rollHistory) { state, rollHistory ->
+        state.copy(rollHistory = rollHistory)
       }
       .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(UI_STATE_STOP_TIMEOUT_MS),
         initialValue = DiceUiState(),
       )
 
   fun addDie(diceType: DiceType) {
-    if (_isRolling.value) return
-    val updatedDice =
-      _selectedDice.value.toMutableMap().apply { put(diceType, (get(diceType) ?: 0) + 1) }
-    setSelectedDice(updatedDice)
+    updateSelectedDice { selectedDice -> selectedDice.increment(diceType) }
   }
 
   fun removeDie(diceType: DiceType) {
-    if (_isRolling.value) return
-    val currentCount = _selectedDice.value[diceType] ?: return
-    val updatedDice =
-      _selectedDice.value.toMutableMap().apply {
-        if (currentCount <= 1) {
-          remove(diceType)
-        } else {
-          put(diceType, currentCount - 1)
-        }
-      }
-    setSelectedDice(updatedDice)
+    updateSelectedDice { selectedDice -> selectedDice.decrement(diceType) }
   }
 
   fun setModifier(value: Int) {
@@ -136,6 +123,15 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
 
   fun clearHistory() {
     viewModelScope.launch { repository.clearHistory() }
+  }
+
+  private fun updateSelectedDice(transform: (Map<DiceType, Int>) -> Map<DiceType, Int>) {
+    if (_isRolling.value) return
+    val currentDice = _selectedDice.value
+    val updatedDice = transform(currentDice)
+    if (updatedDice != currentDice) {
+      setSelectedDice(updatedDice)
+    }
   }
 
   private fun setSelectedDice(selectedDice: Map<DiceType, Int>) {
@@ -198,7 +194,22 @@ class MainScreenViewModel(private val repository: DataRepository) : ViewModel() 
   private fun Int.randomDieValue(): Int =
     Random.nextInt(from = MIN_DICE_VALUE, until = coerceAtLeast(MIN_DICE_FACE_COUNT) + 1)
 
+  private fun Map<DiceType, Int>.increment(diceType: DiceType): Map<DiceType, Int> =
+    toMutableMap().apply { put(diceType, (get(diceType) ?: 0) + 1) }
+
+  private fun Map<DiceType, Int>.decrement(diceType: DiceType): Map<DiceType, Int> {
+    val currentCount = this[diceType] ?: return this
+    return toMutableMap().apply {
+      if (currentCount <= 1) {
+        remove(diceType)
+      } else {
+        put(diceType, currentCount - 1)
+      }
+    }
+  }
+
   private companion object {
+    const val UI_STATE_STOP_TIMEOUT_MS = 5_000L
     const val MIN_DICE_VALUE = 1
     const val MIN_DICE_FACE_COUNT = 1
     const val ROLL_ANIMATION_STEPS = 10

@@ -22,6 +22,10 @@ The main experience should feel like preparing and rolling dice on a real table:
 * Avoid UI that hides core actions behind too many taps during play.
 * Use motion to explain interactions, not as decoration.
 * Keep implementation changes scoped to the current product surface unless a data-model change is explicitly promoted.
+* Keep Compose entry points thin: screen wiring, layout, controls, previews, and data access should live in focused files.
+* Keep repository contracts, Room implementations, and test fakes separated so persistence changes are easy to review.
+* Treat formatter, lint, and warning failures as technical debt; fix the cause instead of adding baselines or suppressions.
+* Keep bitmap resources in density-aware or `drawable-nodpi` folders so the resource tree stays lint-clean.
 
 ---
 

@@ -2,8 +2,9 @@
 
 DiceScroll is a Jetpack Compose Android dice roller optimized for tabletop sessions: fast tray building, readable dice, reliable local history, and a rolling flow that stays usable during play.
 
-This document has two sections:
+This document has three sections:
 
+* **Current Baseline**: the product and technical state the roadmap starts from.
 * **Active Roadmap**: committed tasks to implement next.
 * **Nice to Have Backlog**: detailed ideas that are not scheduled yet.
 
@@ -11,15 +12,22 @@ This document has two sections:
 
 ## Current Baseline
 
-The app already has a Compose/Material 3 main screen, a ViewModel-driven tray, standard dice (`D4`, `D6`, `D8`, `D10`, `D12`, `D20`, `D100`), roll animation, modifiers, haptics, and session history.
+The app already has a Compose/Material 3 main screen, a ViewModel-driven tray, standard dice (`D4`, `D6`, `D8`, `D10`, `D12`, `D20`, `D100`), roll animation, modifiers, haptics, Room persistence, restored tray state, persisted roll history, snapshot-based reroll, a dedicated History tab, and a visible dice pool grid.
 
-Important implementation gaps:
+Completed milestone outcomes:
+
+* `v0.2 - Tabletop Tray UX`: grid dice pool, tap-to-add, tap-tray-to-remove, responsive tray layout, basic selection feedback, and compact modifier access.
+* `v0.3 - Local Persistence and History Tab`: Room storage, restored tray state, persisted history, timestamps, roll snapshots, and snapshot-based history reroll.
+
+Remaining implementation gaps:
 
 * `DiceType` is still an enum, so it cannot represent user-created dice without a future model change.
-* `DefaultDataRepository` is in-memory, so tray state and roll history are lost after process death.
-* Roll history is still shown in a modal bottom sheet instead of a dedicated navigation tab.
-* The dice pool is still a horizontal row with add/remove buttons instead of a visible grid with direct selection.
-* Roll history should store snapshots of dice data so old results and rerolls stay correct after dice definitions change in the future.
+* The top title row, tabs, and system inset handling need alignment and edge-to-edge polish.
+* The Roller/History tab change is currently too abrupt and needs a smooth moving indicator.
+* A fresh app state should show an empty tray, not an unexplained default die.
+* Tray motion should clearly show dice moving into and out of the active tray.
+* The dice pool can still look clipped on small screens and needs final readability tuning.
+* History rows need a cleaner layout for setup, values, total, timestamp, and reroll action.
 
 ---
 
@@ -27,56 +35,82 @@ Important implementation gaps:
 
 Only the milestones in this section are committed work.
 
-### v0.2 - Tabletop Tray UX
+### v0.4 - Interaction Polish and Layout Correctness
 
-Goal: make the main rolling flow fast and readable during an active tabletop session.
-
-Tasks:
-
-* [x] Replace the horizontal dice pool with a grid that keeps all standard dice visible on typical phone screens.
-* [x] Remove add/delete controls from dice pool cards.
-* [x] Add dice by tapping a die in the pool.
-* [x] Remove a specific die by tapping it in the tray.
-* [x] Add a basic pool-to-tray selection animation.
-* [x] Make the tray responsive so dice never overlap and remain visible through a grid or scrollable layout.
-* [x] Move modifiers into a collapsible section that can be hidden, expanded, enabled, or disabled.
-
-Acceptance criteria:
-
-* All seven standard dice are visible in the pool without horizontal scrolling on common portrait layouts.
-* Tapping a pool die adds exactly one matching die to the tray.
-* Tapping a tray die removes that die without affecting unrelated dice.
-* The roll button remains disabled for an empty tray.
-* Large trays remain usable without visual overlap.
-* Modifier controls do not dominate the default rolling screen.
-
-### v0.3 - Local Persistence and History Tab
-
-Goal: make session data durable and make history useful during play.
+Goal: make the current roller and history experience feel deliberate, readable, and stable on common Android phone layouts before adding larger product features.
 
 Tasks:
 
-* [x] Introduce Room as the local persistence layer.
-* [x] Persist roll history.
-* [x] Persist and restore the current tray state.
-* [x] Replace the history bottom sheet with a dedicated bottom navigation tab.
-* [x] Show full local date and time for each roll.
-* [x] Store roll history as immutable snapshots of the dice definitions used at roll time.
-* [x] Support rerolling from history by executing the stored snapshot, not a mutable current definition.
+* [ ] Fix top layout and system bar handling.
+  * Audit `MainActivity`, `Navigation`, and `MainScreen` inset usage.
+  * Keep edge-to-edge transparent system bars enabled.
+  * Remove double outer spacing caused by applying safe drawing padding and screen padding at the wrong level.
+  * Align the title, clear action, and top tabs to the same horizontal rhythm.
+  * Verify the status bar area blends with the app background instead of looking like a separate blocked strip.
 
-Conceptual interfaces:
+* [ ] Animate the Roller/History tabs.
+  * Replace the instant selected-state jump with a smooth moving indicator.
+  * Keep both labels stable, readable, and tappable while the indicator moves.
+  * Preserve the current top-tabs navigation model; do not restore bottom navigation.
+  * Use Compose animation primitives that remain reliable across screen sizes.
 
-* `RollSnapshot`: dice definitions at roll time, selected quantities, modifier state, roll results, and total.
-* `RollHistoryEntry`: id, timestamp, snapshot, and display metadata for list rendering.
-* `PersistedTray`: current selected dice and modifier state restored on app start.
+* [ ] Make the empty tray state explicit.
+  * If no tray has been saved, start with an empty tray.
+  * Keep restored persisted tray state when saved data exists.
+  * Remove implicit default `1D6` behavior from default UI state and in-memory test repository where it creates fake initial dice.
+  * Keep the roll button disabled while the tray is empty.
+
+* [ ] Make tray contents match selected dice exactly.
+  * The tray must show only currently selected dice.
+  * Tapping `D4` once in the pool shows exactly one `D4` in the tray.
+  * Tapping `D4` again adds a second visible `D4`.
+  * Tapping a die in the tray removes exactly one die of that type without affecting unrelated dice.
+  * Preserve roll-result rendering after a roll and snapshot reroll behavior from history.
+
+* [ ] Add targeted pool-to-tray and tray-to-pool motion.
+  * Use robust Compose motion, not fragile pixel-perfect coordinate tracking.
+  * Animate source pool-card feedback when adding a die.
+  * Animate tray item insertion with stable keys, scale/fade, and `animateItem`.
+  * Animate removal with clear reverse feedback so it feels like the die returns toward its source pool card.
+  * Keep motion short enough for repeated tabletop use.
+
+* [ ] Fix dice pool readability and bottom clipping.
+  * Review fixed heights, bottom padding, and system inset interactions.
+  * Ensure the pool is not cut off at the bottom on common portrait layouts.
+  * Keep all seven standard dice readable with responsive cells.
+  * Avoid text truncation inside dice cards.
+  * Preserve tap-to-add behavior and selected-count badges.
+
+* [ ] Standardize app motion polish.
+  * Define shared duration/easing constants for tab indicator, pool feedback, tray insertion/removal, roll button press, and history interactions.
+  * Reduce abrupt jumps without making the app feel slow.
+  * Keep haptic feedback aligned with meaningful roll state changes.
+  * Avoid adding decorative motion that does not support the tabletop workflow.
+
+* [ ] Redesign history rows.
+  * Reorganize each history item around dice setup, roll values, total, timestamp, and reroll action.
+  * Make timestamp readable but visually secondary.
+  * Keep total prominent and easy to scan.
+  * Keep reroll discoverable without crowding the roll details.
+  * Preserve clear-history and snapshot reroll flows.
 
 Acceptance criteria:
 
-* Restarting the app restores the current tray.
-* Restarting the app keeps previous roll history.
-* History displays readable timestamps with date and time.
-* Reroll from history reproduces the same dice setup even if dice definitions are later edited or deleted.
-* Clearing history does not delete saved tray state or future custom dice data.
+* App opens with an empty tray when there is no saved tray.
+* Title, top actions, and tabs align cleanly with transparent system/status bar behavior.
+* Roller/History tab transition animates smoothly.
+* Tray never shows unselected placeholder dice.
+* Adding and removing dice has clear directional motion.
+* Dice pool is not clipped at the bottom on common portrait layouts.
+* History rows separate setup, values, total, time, and reroll clearly.
+* Existing persistence, modifier, rolling, and history reroll behavior remain intact unless explicitly covered above.
+
+Verification:
+
+* Preview or manually inspect small and standard portrait layouts.
+* Add or update Compose UI tests for empty tray, top tabs, dice add/remove, modifier access, and history layout smoke coverage.
+* Run `scripts/verify.sh`.
+* Compile android tests with `./gradlew assembleDebugAndroidTest` when UI tests change.
 
 ---
 

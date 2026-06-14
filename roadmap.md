@@ -33,7 +33,7 @@ Goal: make the current roller and history experience feel deliberate, readable, 
 
 Tasks:
 
-* [ ] Fix top layout and system bar handling.
+* [x] Fix top layout and system bar handling.
   * Audit `MainActivity`, `Navigation`, and `MainScreen` inset usage.
   * Keep edge-to-edge transparent system bars enabled.
   * Remove double outer spacing caused by applying safe drawing padding and screen padding at the wrong level.

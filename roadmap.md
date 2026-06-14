@@ -79,7 +79,7 @@ Tasks:
   * Keep haptic feedback aligned with meaningful roll state changes.
   * Avoid adding decorative motion that does not support the tabletop workflow.
 
-* [ ] Redesign history rows.
+* [x] Redesign history rows.
   * Reorganize each history item around dice setup, roll values, total, timestamp, and reroll action.
   * Make timestamp readable but visually secondary.
   * Keep total prominent and easy to scan.

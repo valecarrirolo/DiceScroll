@@ -10,6 +10,11 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
+import com.github.valecarrirolo.dicescroll.data.model.RollResult
+import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
+import java.text.SimpleDateFormat
+import java.util.Locale
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -73,5 +78,30 @@ class MainScreenTest {
 
     composeTestRule.onAllNodesWithTag("tray-die-D4")[0].performClick()
     composeTestRule.onAllNodesWithTag("tray-die-D4").assertCountEquals(1)
+  }
+
+  @Test
+  fun historyItem_showsSeparatedRollDetails() {
+    composeTestRule.setContent {
+      HistoryItem(
+        roll =
+          RollResult(
+            timestamp = 1_700_000_000_000,
+            rolls =
+              listOf(
+                SingleDieRoll(diceType = DiceType.D6, value = 4),
+                SingleDieRoll(diceType = DiceType.D20, value = 15),
+              ),
+            modifier = 2,
+          ),
+        dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US),
+      )
+    }
+
+    composeTestRule.onNodeWithText("1D6, 1D20").assertExists()
+    composeTestRule.onNodeWithText("Values: 4, 15   Modifier: +2").assertExists()
+    composeTestRule.onNodeWithText("21").assertExists()
+    composeTestRule.onNodeWithText("total").assertExists()
+    composeTestRule.onNodeWithText("Reroll").assertExists()
   }
 }

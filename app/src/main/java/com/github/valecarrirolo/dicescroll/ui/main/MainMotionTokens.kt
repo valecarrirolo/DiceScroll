@@ -1,6 +1,6 @@
 package com.github.valecarrirolo.dicescroll.ui.main
 
-internal object MainMotion {
+internal object MainMotionTokens {
   const val TAB_INDICATOR_MILLIS = 220
   const val DICE_FEEDBACK_MILLIS = 180
   const val TRAY_HIGHLIGHT_MILLIS = 260L

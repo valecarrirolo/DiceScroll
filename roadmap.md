@@ -23,6 +23,10 @@ The main experience should feel like preparing and rolling dice on a real table:
 * Use motion to explain interactions, not as decoration.
 * Keep implementation changes scoped to the current product surface unless a data-model change is explicitly promoted.
 * Keep Compose entry points thin: screen wiring, layout, controls, previews, and data access should live in focused files.
+* Name UI files by responsibility, not by implementation accident: shell, tabs, tray, pool, controls, history content, history items, and summaries should remain easy to find.
+* Avoid catch-all composable files. Split a file when it starts owning unrelated layout, controls, formatting, and preview code.
+* Keep screen entry points free from previews; store broad previews in preview files and leaf previews beside the component they exercise.
+* Use targeted `@OptIn` annotations close to experimental API usage instead of broad file-level opt-ins.
 * Keep repository contracts, Room implementations, and test fakes separated so persistence changes are easy to review.
 * Treat formatter, lint, and warning failures as technical debt; fix the cause instead of adding baselines or suppressions.
 * Keep bitmap resources in density-aware or `drawable-nodpi` folders so the resource tree stays lint-clean.
@@ -31,24 +35,9 @@ The main experience should feel like preparing and rolling dice on a real table:
 
 ## Things We Want To Do
 
-### Basic History Stats
+No committed implementation milestone is active right now.
 
-Goal: make the existing roll history easier to summarize without adding charts, a dedicated Stats tab, or new persistence models.
-
-Tasks:
-
-* [ ] Add a compact stats summary above non-empty history lists.
-* [ ] Calculate roll count, dice rolled, average total, min total, and max total from existing `RollResult` history.
-* [ ] Keep totals based on `RollResult.total`, including modifiers.
-* [ ] Keep empty history unchanged with no stats summary.
-* [ ] Add unit and Compose smoke coverage for the summary behavior.
-
-Out of scope:
-
-* Per-die breakdowns.
-* Advanced charts or trend analysis.
-* A dedicated Stats tab.
-* Database, repository, or roll model changes.
+Use this section only for work that has been explicitly promoted into the next milestone. When a milestone ships, remove it from this active list so the roadmap stays focused on what still needs to be done.
 
 ---
 
@@ -73,12 +62,12 @@ Future notes:
 
 ### Advanced Stats and Analysis
 
-Status: later, after basic history stats are validated in real use.
+Status: later. The compact history summary exists; deeper analysis is not scheduled.
 
 Why not now:
 
 * Advanced charts and probability analysis are secondary to fast rolling.
-* Per-die breakdowns should wait until the first compact stats summary proves useful.
+* Per-die breakdowns should wait until the compact stats summary proves useful in real sessions.
 * Clearing history and future custom dice must have clear behavior before deeper analysis is promoted.
 
 ### Dice Skins and Visual Customization

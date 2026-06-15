@@ -40,6 +40,7 @@ import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun HistoryTabContent(
@@ -82,6 +83,10 @@ fun HistoryTabContent(
         )
       }
     } else {
+      HistoryStatsSummary(stats = state.rollHistory.toHistoryStats())
+
+      Spacer(modifier = Modifier.height(12.dp))
+
       LazyColumn(
         modifier = Modifier.weight(1f).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -91,6 +96,74 @@ fun HistoryTabContent(
         }
       }
     }
+  }
+}
+
+@Composable
+private fun HistoryStatsSummary(stats: HistoryStats?) {
+  if (stats == null) return
+
+  Card(
+    modifier = Modifier.fillMaxWidth(),
+    colors =
+      CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f)
+      ),
+  ) {
+    Column(
+      modifier = Modifier.fillMaxWidth().padding(14.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        HistoryStatCell(
+          label = "Rolls",
+          value = "${stats.rollCount}",
+          modifier = Modifier.weight(1f),
+        )
+        HistoryStatCell(
+          label = "Dice",
+          value = "${stats.diceRolled}",
+          modifier = Modifier.weight(1f),
+        )
+      }
+
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        HistoryStatCell(
+          label = "Avg",
+          value = stats.averageTotal.asStatValue(),
+          modifier = Modifier.weight(1f),
+        )
+        HistoryStatCell(label = "Min", value = "${stats.minTotal}", modifier = Modifier.weight(1f))
+        HistoryStatCell(label = "Max", value = "${stats.maxTotal}", modifier = Modifier.weight(1f))
+      }
+    }
+  }
+}
+
+@Composable
+private fun HistoryStatCell(label: String, value: String, modifier: Modifier = Modifier) {
+  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Text(
+      text = label,
+      fontSize = 11.sp,
+      color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.48f),
+    )
+    Text(
+      text = value,
+      fontWeight = FontWeight.Black,
+      fontSize = 18.sp,
+      fontFamily = FontFamily.Monospace,
+      color = NeonTeal,
+    )
+  }
+}
+
+private fun Double.asStatValue(): String {
+  val rounded = roundToInt()
+  return if (this == rounded.toDouble()) {
+    "$rounded"
+  } else {
+    String.format(Locale.US, "%.1f", this)
   }
 }
 

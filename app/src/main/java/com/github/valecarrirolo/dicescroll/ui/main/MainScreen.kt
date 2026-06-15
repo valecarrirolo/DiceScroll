@@ -10,9 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.valecarrirolo.dicescroll.data.DefaultDataRepository
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
+import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 
 @Composable
 fun MainScreen(
@@ -51,4 +54,23 @@ fun MainScreen(
 private fun defaultMainScreenViewModel(): MainScreenViewModel {
   val context = LocalContext.current.applicationContext
   return viewModel { MainScreenViewModel(DefaultDataRepository(context)) }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+  DiceScrollTheme {
+    MainScreenContent(
+      state =
+        DiceUiState(
+          selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1),
+          modifier = 2,
+        ),
+      onClearTray = {},
+      onSetModifier = {},
+      onRoll = {},
+      onAddDie = {},
+      onRemoveDie = {},
+    )
+  }
 }

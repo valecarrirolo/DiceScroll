@@ -87,3 +87,24 @@ fun TrayContentRollingPreview() {
     }
   }
 }
+
+@Preview(showBackground = true, name = "Main Screen Landscape", widthDp = 840, heightDp = 420)
+@Composable
+fun MainScreenContentLandscapePreview() {
+  DiceScrollTheme(darkTheme = true) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+      MainScreenContent(
+        state =
+          DiceUiState(
+            selectedDice = mapOf(DiceType.D4 to 2, DiceType.D6 to 3, DiceType.D20 to 1),
+            modifier = 1,
+          ),
+        onClearTray = {},
+        onSetModifier = {},
+        onRoll = {},
+        onAddDie = {},
+        onRemoveDie = {},
+      )
+    }
+  }
+}

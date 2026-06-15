@@ -31,10 +31,12 @@ import kotlinx.coroutines.delay
 private const val MAX_TRAY_DICE = 12
 private val ScreenHorizontalPadding = 16.dp
 private val ScreenBottomSpacer = 12.dp
-private val LandscapeGap = 16.dp
+private val LandscapeGap = 12.dp
 private val LandscapeVerticalPadding = 8.dp
 private val PortraitTrayBottomPadding = 10.dp
 private val PortraitTrayTopPadding = 8.dp
+private const val LandscapeTrayWeight = 1.85f
+private const val LandscapeControlsWeight = 1f
 
 private data class DiceFeedback(val added: DiceType? = null, val removed: DiceType? = null)
 
@@ -202,12 +204,18 @@ private fun LandscapeRollerContent(
       state = state,
       highlightedDie = diceFeedback.added,
       onRemoveDie = onRemoveDie,
-      modifier = Modifier.weight(1f).fillMaxHeight().padding(vertical = LandscapeVerticalPadding),
+      modifier =
+        Modifier.weight(LandscapeTrayWeight)
+          .fillMaxHeight()
+          .padding(vertical = LandscapeVerticalPadding),
     )
 
     Column(
-      modifier = Modifier.weight(1.2f).fillMaxHeight().padding(vertical = LandscapeVerticalPadding),
-      verticalArrangement = Arrangement.SpaceBetween,
+      modifier =
+        Modifier.weight(LandscapeControlsWeight)
+          .fillMaxHeight()
+          .padding(vertical = LandscapeVerticalPadding),
+      verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       RollControls(

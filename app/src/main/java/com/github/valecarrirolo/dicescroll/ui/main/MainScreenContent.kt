@@ -65,7 +65,7 @@ fun MainScreenContent(
 
   LaunchedEffect(diceFeedback) {
     if (diceFeedback.added != null || diceFeedback.removed != null) {
-      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS.milliseconds)
+      delay(MainMotionTokens.TRAY_HIGHLIGHT_MILLIS.milliseconds)
       diceFeedback = DiceFeedback()
     }
   }
@@ -97,7 +97,7 @@ fun MainScreenContent(
 
     when (selectedTab) {
       MainTab.History ->
-        HistoryTabContent(
+        HistoryContent(
           state = state,
           onClearHistory = onClearHistory,
           onReroll = onRerollHistory,

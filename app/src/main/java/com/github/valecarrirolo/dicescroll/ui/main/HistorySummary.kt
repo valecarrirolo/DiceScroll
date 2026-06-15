@@ -25,6 +25,23 @@ private val HistorySummaryPadding = 14.dp
 private val HistorySummaryGap = 10.dp
 private val HistorySummaryMetricGap = 2.dp
 
+@ThemePreviews
+@Composable
+fun HistorySummaryPreview() {
+  ThemedPreview {
+    HistorySummary(
+      stats =
+        HistoryStats(
+          rollCount = 5,
+          diceRolled = 12,
+          averageTotal = 18.5,
+          minTotal = 4,
+          maxTotal = 42,
+        )
+    )
+  }
+}
+
 @Composable
 internal fun HistorySummary(stats: HistoryStats?) {
   if (stats == null) return
@@ -88,22 +105,5 @@ private fun Double.asCompactStatValue(): String {
     "$rounded"
   } else {
     String.format(Locale.US, "%.1f", this)
-  }
-}
-
-@ThemePreviews
-@Composable
-fun HistorySummaryPreview() {
-  ThemedPreview {
-    HistorySummary(
-      stats =
-        HistoryStats(
-          rollCount = 5,
-          diceRolled = 12,
-          averageTotal = 18.5,
-          minTotal = 4,
-          maxTotal = 42,
-        )
-    )
   }
 }

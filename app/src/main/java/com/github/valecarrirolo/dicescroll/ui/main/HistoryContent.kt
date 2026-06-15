@@ -39,6 +39,32 @@ private val HistoryHeaderBottomGap = 16.dp
 private val HistorySummaryBottomGap = 12.dp
 private val HistoryRowGap = 12.dp
 
+@ThemePreviews
+@Composable
+fun HistoryContentPreview() {
+  ThemedPreview {
+    HistoryContent(
+      state =
+        DiceUiState(
+          rollHistory =
+            listOf(
+              RollResult(
+                rolls =
+                  listOf(
+                    SingleDieRoll(diceType = DiceType.D6, value = 4),
+                    SingleDieRoll(diceType = DiceType.D20, value = 15),
+                  ),
+                modifier = 2,
+                timestamp = 1700000000000,
+              )
+            )
+        ),
+      onClearHistory = {},
+      onReroll = {},
+    )
+  }
+}
+
 @Composable
 fun HistoryContent(
   state: DiceUiState,
@@ -102,32 +128,6 @@ private fun EmptyHistoryMessage(modifier: Modifier = Modifier) {
       text = "No rolls in this session yet.",
       color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
       textAlign = TextAlign.Center,
-    )
-  }
-}
-
-@ThemePreviews
-@Composable
-fun HistoryContentPreview() {
-  ThemedPreview {
-    HistoryContent(
-      state =
-        DiceUiState(
-          rollHistory =
-            listOf(
-              RollResult(
-                rolls =
-                  listOf(
-                    SingleDieRoll(diceType = DiceType.D6, value = 4),
-                    SingleDieRoll(diceType = DiceType.D20, value = 15),
-                  ),
-                modifier = 2,
-                timestamp = 1700000000000,
-              )
-            )
-        ),
-      onClearHistory = {},
-      onReroll = {},
     )
   }
 }

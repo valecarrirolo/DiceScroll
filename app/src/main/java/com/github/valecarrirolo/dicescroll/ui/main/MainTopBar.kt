@@ -31,6 +31,12 @@ private val TopBarLogoSize = 32.dp
 private val TopBarLogoRadius = 8.dp
 private val TopBarTitleGap = 10.dp
 
+@ThemePreviews
+@Composable
+fun MainTopBarPreview() {
+  ThemedPreview { MainTopBar(onClearTray = {}) }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainTopBar(onClearTray: () -> Unit) {
@@ -64,10 +70,4 @@ internal fun MainTopBar(onClearTray: () -> Unit) {
     },
     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
   )
-}
-
-@ThemePreviews
-@Composable
-fun MainTopBarPreview() {
-  ThemedPreview { MainTopBar(onClearTray = {}) }
 }

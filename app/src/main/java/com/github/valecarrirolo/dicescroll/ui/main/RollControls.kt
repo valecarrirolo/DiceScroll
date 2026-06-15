@@ -41,6 +41,20 @@ private val RollControlHeight = 52.dp
 private val RollButtonRadius = 26.dp
 private val RollControlsGap = 10.dp
 
+@ThemePreviews
+@Composable
+fun RollControlsPreview() {
+  ThemedPreview {
+    RollControls(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2), modifier = 1),
+      modifierEnabled = true,
+      onModifierClick = {},
+      onRoll = {},
+      modifier = Modifier.padding(16.dp),
+    )
+  }
+}
+
 @Composable
 internal fun RollControls(
   state: DiceUiState,
@@ -127,19 +141,5 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
         color = if (enabled) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
-  }
-}
-
-@ThemePreviews
-@Composable
-fun RollControlsPreview() {
-  ThemedPreview {
-    RollControls(
-      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2), modifier = 1),
-      modifierEnabled = true,
-      onModifierClick = {},
-      onRoll = {},
-      modifier = Modifier.padding(16.dp),
-    )
   }
 }

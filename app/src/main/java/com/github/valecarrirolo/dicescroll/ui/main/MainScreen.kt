@@ -23,6 +23,21 @@ import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
 import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
+@ThemePreviews
+@Composable
+fun MainScreenPreview() {
+  ThemedPreview {
+    MainScreenContent(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
+      onClearTray = {},
+      onSetModifier = {},
+      onRoll = {},
+      onAddDie = {},
+      onRemoveDie = {},
+    )
+  }
+}
+
 @Composable
 fun MainScreen(
   modifier: Modifier = Modifier,
@@ -60,19 +75,4 @@ fun MainScreen(
 private fun defaultMainScreenViewModel(): MainScreenViewModel {
   val context = LocalContext.current.applicationContext
   return viewModel { MainScreenViewModel(DefaultDataRepository(context)) }
-}
-
-@ThemePreviews
-@Composable
-fun MainScreenPreview() {
-  ThemedPreview {
-    MainScreenContent(
-      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
-      onClearTray = {},
-      onSetModifier = {},
-      onRoll = {},
-      onAddDie = {},
-      onRemoveDie = {},
-    )
-  }
 }

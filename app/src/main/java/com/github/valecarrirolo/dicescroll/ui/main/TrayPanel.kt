@@ -35,6 +35,19 @@ private val EmptyTrayPadding = 20.dp
 private val EmptyTrayIconSize = 44.dp
 private val EmptyTrayGap = 10.dp
 
+@ThemePreviews
+@Composable
+fun TrayPanelPreview() {
+  ThemedPreview {
+    TrayPanel(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
+      highlightedDie = null,
+      onRemoveDie = {},
+      modifier = Modifier.size(300.dp, 200.dp).padding(16.dp),
+    )
+  }
+}
+
 @Composable
 internal fun TrayPanel(
   state: DiceUiState,
@@ -97,19 +110,6 @@ private fun EmptyTrayMessage() {
       fontSize = 14.sp,
       color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
       textAlign = TextAlign.Center,
-    )
-  }
-}
-
-@ThemePreviews
-@Composable
-fun TrayPanelPreview() {
-  ThemedPreview {
-    TrayPanel(
-      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
-      highlightedDie = null,
-      onRemoveDie = {},
-      modifier = Modifier.size(300.dp, 200.dp).padding(16.dp),
     )
   }
 }

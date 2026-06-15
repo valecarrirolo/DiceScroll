@@ -20,6 +20,17 @@ import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
 import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
+@ThemePreviews
+@Composable
+fun ModifierChipPreview() {
+  ThemedPreview {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
+      ModifierChip(modifierValue = 3, modifierEnabled = true, onClick = {})
+      ModifierChip(modifierValue = 0, modifierEnabled = false, onClick = {})
+    }
+  }
+}
+
 @Composable
 fun ModifierChip(
   modifierValue: Int,
@@ -60,14 +71,3 @@ fun ModifierChip(
 }
 
 fun Int.asSignedLabel(): String = "${if (this >= 0) "+" else ""}$this"
-
-@ThemePreviews
-@Composable
-fun ModifierChipPreview() {
-  ThemedPreview {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
-      ModifierChip(modifierValue = 3, modifierEnabled = true, onClick = {})
-      ModifierChip(modifierValue = 0, modifierEnabled = false, onClick = {})
-    }
-  }
-}

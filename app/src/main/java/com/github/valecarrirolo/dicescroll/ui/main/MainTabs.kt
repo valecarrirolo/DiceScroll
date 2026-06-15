@@ -46,6 +46,12 @@ private val TabBarInnerRadius = 15.dp
 private val TabIndicatorHeight = 34.dp
 private val TabBarInnerPadding = 3.dp
 
+@ThemePreviews
+@Composable
+fun MainTabsPreview() {
+  ThemedPreview { MainTabs(selectedTab = MainTab.Roller, onTabSelected = {}) }
+}
+
 @Composable
 internal fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
   Surface(
@@ -103,10 +109,4 @@ internal fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
       }
     }
   }
-}
-
-@ThemePreviews
-@Composable
-fun MainTabsPreview() {
-  ThemedPreview { MainTabs(selectedTab = MainTab.Roller, onTabSelected = {}) }
 }

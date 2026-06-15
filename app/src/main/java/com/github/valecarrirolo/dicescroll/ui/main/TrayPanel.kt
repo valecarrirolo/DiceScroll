@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 private val TrayPanelRadius = 20.dp
 private val EmptyTrayPadding = 20.dp
@@ -95,6 +97,19 @@ private fun EmptyTrayMessage() {
       fontSize = 14.sp,
       color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
       textAlign = TextAlign.Center,
+    )
+  }
+}
+
+@ThemePreviews
+@Composable
+fun TrayPanelPreview() {
+  ThemedPreview {
+    TrayPanel(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
+      highlightedDie = null,
+      onRemoveDie = {},
+      modifier = Modifier.size(300.dp, 200.dp).padding(16.dp),
     )
   }
 }

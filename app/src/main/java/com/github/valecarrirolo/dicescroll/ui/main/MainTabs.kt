@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 private val TabBarHorizontalPadding = 16.dp
 private val TabBarBottomPadding = 6.dp
@@ -43,43 +45,6 @@ private val TabBarOuterRadius = 18.dp
 private val TabBarInnerRadius = 15.dp
 private val TabIndicatorHeight = 34.dp
 private val TabBarInnerPadding = 3.dp
-private val TopBarLogoSize = 32.dp
-private val TopBarLogoRadius = 8.dp
-private val TopBarTitleGap = 10.dp
-
-@Composable
-internal fun MainTopBar(onClearTray: () -> Unit) {
-  TopAppBar(
-    title = {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(TopBarTitleGap),
-      ) {
-        Image(
-          painter = painterResource(id = R.drawable.ic_launcher_foreground),
-          contentDescription = "DiceScroll Logo",
-          modifier = Modifier.size(TopBarLogoSize).clip(RoundedCornerShape(TopBarLogoRadius)),
-        )
-        Text(
-          text = "DiceScroll",
-          fontWeight = FontWeight.ExtraBold,
-          fontFamily = FontFamily.Monospace,
-          color = MaterialTheme.colorScheme.primary,
-        )
-      }
-    },
-    actions = {
-      IconButton(onClick = onClearTray) {
-        Icon(
-          imageVector = Icons.Default.Refresh,
-          contentDescription = "Clear Tray",
-          tint = MaterialTheme.colorScheme.onBackground,
-        )
-      }
-    },
-    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-  )
-}
 
 @Composable
 internal fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
@@ -138,4 +103,10 @@ internal fun MainTabs(selectedTab: MainTab, onTabSelected: (MainTab) -> Unit) {
       }
     }
   }
+}
+
+@ThemePreviews
+@Composable
+fun MainTabsPreview() {
+  ThemedPreview { MainTabs(selectedTab = MainTab.Roller, onTabSelected = {}) }
 }

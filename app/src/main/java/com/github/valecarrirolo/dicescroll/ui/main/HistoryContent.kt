@@ -26,7 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
+import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -98,6 +102,32 @@ private fun EmptyHistoryMessage(modifier: Modifier = Modifier) {
       text = "No rolls in this session yet.",
       color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
       textAlign = TextAlign.Center,
+    )
+  }
+}
+
+@ThemePreviews
+@Composable
+fun HistoryContentPreview() {
+  ThemedPreview {
+    HistoryContent(
+      state =
+        DiceUiState(
+          rollHistory =
+            listOf(
+              RollResult(
+                rolls =
+                  listOf(
+                    SingleDieRoll(diceType = DiceType.D6, value = 4),
+                    SingleDieRoll(diceType = DiceType.D20, value = 15),
+                  ),
+                modifier = 2,
+                timestamp = 1700000000000,
+              )
+            )
+        ),
+      onClearHistory = {},
+      onReroll = {},
     )
   }
 }

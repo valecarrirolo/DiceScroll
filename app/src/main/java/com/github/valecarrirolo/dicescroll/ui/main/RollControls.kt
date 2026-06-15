@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,8 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 import kotlinx.coroutines.launch
 
 private val RollControlHeight = 52.dp
@@ -123,5 +127,19 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
         color = if (enabled) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
+  }
+}
+
+@ThemePreviews
+@Composable
+fun RollControlsPreview() {
+  ThemedPreview {
+    RollControls(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2), modifier = 1),
+      modifierEnabled = true,
+      onModifierClick = {},
+      onRoll = {},
+      modifier = Modifier.padding(16.dp),
+    )
   }
 }

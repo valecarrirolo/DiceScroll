@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -86,5 +88,22 @@ private fun Double.asCompactStatValue(): String {
     "$rounded"
   } else {
     String.format(Locale.US, "%.1f", this)
+  }
+}
+
+@ThemePreviews
+@Composable
+fun HistorySummaryPreview() {
+  ThemedPreview {
+    HistorySummary(
+      stats =
+        HistoryStats(
+          rollCount = 5,
+          diceRolled = 12,
+          averageTotal = 18.5,
+          minTotal = 4,
+          maxTotal = 42,
+        )
+    )
   }
 }

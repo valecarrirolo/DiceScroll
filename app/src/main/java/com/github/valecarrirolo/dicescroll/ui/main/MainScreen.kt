@@ -19,6 +19,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.valecarrirolo.dicescroll.data.DefaultDataRepository
+import com.github.valecarrirolo.dicescroll.data.model.DiceType
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 @Composable
 fun MainScreen(

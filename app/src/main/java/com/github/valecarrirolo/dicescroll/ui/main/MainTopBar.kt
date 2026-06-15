@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.valecarrirolo.dicescroll.R
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 private val TopBarLogoSize = 32.dp
 private val TopBarLogoRadius = 8.dp
@@ -62,4 +64,10 @@ internal fun MainTopBar(onClearTray: () -> Unit) {
     },
     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
   )
+}
+
+@ThemePreviews
+@Composable
+fun MainTopBarPreview() {
+  ThemedPreview { MainTopBar(onClearTray = {}) }
 }

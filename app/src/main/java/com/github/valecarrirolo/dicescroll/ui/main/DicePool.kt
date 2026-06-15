@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 private val DicePoolHeight = 184.dp
 private val DicePoolCellMinSize = 76.dp
@@ -65,5 +67,18 @@ internal fun DicePool(
         )
       }
     }
+  }
+}
+
+@ThemePreviews
+@Composable
+fun DicePoolPreview() {
+  ThemedPreview {
+    DicePool(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
+      recentlyAddedDie = null,
+      recentlyRemovedDie = null,
+      onAddDie = {},
+    )
   }
 }

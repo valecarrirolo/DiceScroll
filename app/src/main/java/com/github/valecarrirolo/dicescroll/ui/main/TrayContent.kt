@@ -1,9 +1,3 @@
-@file:OptIn(
-  androidx.compose.material3.ExperimentalMaterial3Api::class,
-  androidx.compose.foundation.ExperimentalFoundationApi::class,
-  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
-)
-
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.AnimatedContent
@@ -19,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -75,6 +70,7 @@ fun TrayContentPreview() {
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (DiceType) -> Unit) {
   val itemsToDisplay =
     remember(state.isRolling, state.animatedValues, state.currentRollResult, state.selectedDice) {
@@ -108,8 +104,8 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
         targetState = Pair(state.isRolling, state.currentRollResult),
         transitionSpec = {
           fadeIn(
-            animationSpec = tween(MainMotion.TOTAL_FADE_IN_MILLIS, delayMillis = 90)
-          ) togetherWith fadeOut(animationSpec = tween(MainMotion.TOTAL_FADE_OUT_MILLIS))
+            animationSpec = tween(MainMotionTokens.TOTAL_FADE_IN_MILLIS, delayMillis = 90)
+          ) togetherWith fadeOut(animationSpec = tween(MainMotionTokens.TOTAL_FADE_OUT_MILLIS))
         },
         label = "TotalDisplay",
       ) { (rolling, result) ->
@@ -204,7 +200,7 @@ fun DieItem(
       targetValue = 15f,
       animationSpec =
         infiniteRepeatable(
-          animation = tween(MainMotion.SHAKE_MILLIS, easing = LinearEasing),
+          animation = tween(MainMotionTokens.SHAKE_MILLIS, easing = LinearEasing),
           repeatMode = RepeatMode.Reverse,
         ),
       label = "ShakeRotate",
@@ -216,7 +212,7 @@ fun DieItem(
       targetValue = 1.1f,
       animationSpec =
         infiniteRepeatable(
-          animation = tween(MainMotion.SHAKE_MILLIS, easing = LinearEasing),
+          animation = tween(MainMotionTokens.SHAKE_MILLIS, easing = LinearEasing),
           repeatMode = RepeatMode.Reverse,
         ),
       label = "ShakeScale",

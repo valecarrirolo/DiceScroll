@@ -1,9 +1,3 @@
-@file:OptIn(
-  androidx.compose.material3.ExperimentalMaterial3Api::class,
-  androidx.compose.foundation.ExperimentalFoundationApi::class,
-  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
-)
-
 package com.github.valecarrirolo.dicescroll.theme
 
 import android.content.res.Configuration
@@ -13,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -83,9 +76,3 @@ fun ThemedPreview(modifier: Modifier = Modifier, content: @Composable ColumnScop
   uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
 )
 annotation class ThemePreviews
-
-@ThemePreviews
-@Composable
-private fun TestPreview() {
-  ThemedPreview { Text("Hello ThemedPreview! 😁") }
-}

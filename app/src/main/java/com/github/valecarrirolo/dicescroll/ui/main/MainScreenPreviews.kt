@@ -1,9 +1,3 @@
-@file:OptIn(
-  androidx.compose.material3.ExperimentalMaterial3Api::class,
-  androidx.compose.foundation.ExperimentalFoundationApi::class,
-  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
-)
-
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.foundation.background
@@ -16,6 +10,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
 import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
+
+@ThemePreviews
+@Composable
+fun MainScreenPreview() {
+  ThemedPreview {
+    MainScreenContent(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
+      onClearTray = {},
+      onSetModifier = {},
+      onRoll = {},
+      onAddDie = {},
+      onRemoveDie = {},
+    )
+  }
+}
 
 @ThemePreviews
 @Composable

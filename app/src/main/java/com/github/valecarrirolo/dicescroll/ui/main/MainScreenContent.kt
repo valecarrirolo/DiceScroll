@@ -1,9 +1,3 @@
-@file:OptIn(
-  androidx.compose.material3.ExperimentalMaterial3Api::class,
-  androidx.compose.foundation.ExperimentalFoundationApi::class,
-  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
-)
-
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import android.content.res.Configuration
@@ -65,7 +59,7 @@ fun MainScreenContent(
 
   LaunchedEffect(diceFeedback) {
     if (diceFeedback.added != null || diceFeedback.removed != null) {
-      delay(MainMotion.TRAY_HIGHLIGHT_MILLIS.milliseconds)
+      delay(MainMotionTokens.TRAY_HIGHLIGHT_MILLIS.milliseconds)
       diceFeedback = DiceFeedback()
     }
   }
@@ -97,7 +91,7 @@ fun MainScreenContent(
 
     when (selectedTab) {
       MainTab.History ->
-        HistoryTabContent(
+        HistoryContent(
           state = state,
           onClearHistory = onClearHistory,
           onReroll = onRerollHistory,

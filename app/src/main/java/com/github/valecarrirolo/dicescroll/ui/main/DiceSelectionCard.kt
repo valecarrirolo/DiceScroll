@@ -1,9 +1,3 @@
-@file:OptIn(
-  androidx.compose.material3.ExperimentalMaterial3Api::class,
-  androidx.compose.foundation.ExperimentalFoundationApi::class,
-  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
-)
-
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.core.Spring
@@ -75,7 +69,7 @@ fun DiceSelectionCard(
   val returnOffset by
     animateDpAsState(
       targetValue = if (isRecentlyRemoved) (-8).dp else 0.dp,
-      animationSpec = tween(MainMotion.DICE_FEEDBACK_MILLIS),
+      animationSpec = tween(MainMotionTokens.DICE_FEEDBACK_MILLIS),
       label = "DicePoolReturnOffset",
     )
 

@@ -31,7 +31,24 @@ The main experience should feel like preparing and rolling dice on a real table:
 
 ## Things We Want To Do
 
-No committed tasks are currently scheduled. Add new work here only after it has been promoted from the backlog into a concrete implementation plan.
+### Basic History Stats
+
+Goal: make the existing roll history easier to summarize without adding charts, a dedicated Stats tab, or new persistence models.
+
+Tasks:
+
+* [ ] Add a compact stats summary above non-empty history lists.
+* [ ] Calculate roll count, dice rolled, average total, min total, and max total from existing `RollResult` history.
+* [ ] Keep totals based on `RollResult.total`, including modifiers.
+* [ ] Keep empty history unchanged with no stats summary.
+* [ ] Add unit and Compose smoke coverage for the summary behavior.
+
+Out of scope:
+
+* Per-die breakdowns.
+* Advanced charts or trend analysis.
+* A dedicated Stats tab.
+* Database, repository, or roll model changes.
 
 ---
 
@@ -54,15 +71,15 @@ Future notes:
 * `DiceDefinition`: stable id, display name, face count, color, standard/custom kind, and optional skin reference.
 * `SavedTray`: stable id, name, selected dice definitions or snapshots, quantities, and modifier state.
 
-### Stats and Analysis
+### Advanced Stats and Analysis
 
-Status: later, after the main history UI is easier to scan.
+Status: later, after basic history stats are validated in real use.
 
 Why not now:
 
-* Basic stats depend on history being readable and trusted first.
 * Advanced charts and probability analysis are secondary to fast rolling.
-* Clearing history and future custom dice must have clear behavior before stats are promoted.
+* Per-die breakdowns should wait until the first compact stats summary proves useful.
+* Clearing history and future custom dice must have clear behavior before deeper analysis is promoted.
 
 ### Dice Skins and Visual Customization
 

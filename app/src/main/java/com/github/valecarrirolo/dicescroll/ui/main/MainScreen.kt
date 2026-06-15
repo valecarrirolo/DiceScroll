@@ -61,11 +61,7 @@ private fun defaultMainScreenViewModel(): MainScreenViewModel {
 fun MainScreenPreview() {
   DiceScrollTheme {
     MainScreenContent(
-      state =
-        DiceUiState(
-          selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1),
-          modifier = 2,
-        ),
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1), modifier = 2),
       onClearTray = {},
       onSetModifier = {},
       onRoll = {},

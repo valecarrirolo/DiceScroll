@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -103,5 +104,53 @@ class MainScreenTest {
     composeTestRule.onNodeWithText("21").assertExists()
     composeTestRule.onNodeWithText("total").assertExists()
     composeTestRule.onNodeWithText("Reroll").assertExists()
+  }
+
+  @Test
+  fun historyTab_showsStatsSummaryWhenHistoryExists() {
+    composeTestRule.setContent {
+      HistoryTabContent(
+        state =
+          DiceUiState(
+            rollHistory =
+              listOf(
+                RollResult(
+                  rolls =
+                    listOf(
+                      SingleDieRoll(diceType = DiceType.D6, value = 4),
+                      SingleDieRoll(diceType = DiceType.D20, value = 10),
+                    ),
+                  modifier = 2,
+                ),
+                RollResult(
+                  rolls = listOf(SingleDieRoll(diceType = DiceType.D8, value = 8)),
+                  modifier = 1,
+                ),
+              )
+          ),
+        onClearHistory = {},
+        onReroll = {},
+      )
+    }
+
+    composeTestRule.onNodeWithText("Rolls").assertExists()
+    composeTestRule.onNodeWithText("Dice").assertExists()
+    composeTestRule.onNodeWithText("Avg").assertExists()
+    composeTestRule.onNodeWithText("12.5").assertExists()
+    composeTestRule.onNodeWithText("Min").assertExists()
+    composeTestRule.onAllNodesWithText("9").assertCountEquals(2)
+    composeTestRule.onNodeWithText("Max").assertExists()
+    composeTestRule.onAllNodesWithText("16").assertCountEquals(2)
+  }
+
+  @Test
+  fun historyTab_hidesStatsSummaryWhenHistoryIsEmpty() {
+    composeTestRule.setContent {
+      HistoryTabContent(state = DiceUiState(), onClearHistory = {}, onReroll = {})
+    }
+
+    composeTestRule.onNodeWithText("No rolls in this session yet.").assertExists()
+    composeTestRule.onNodeWithText("Rolls").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Avg").assertDoesNotExist()
   }
 }

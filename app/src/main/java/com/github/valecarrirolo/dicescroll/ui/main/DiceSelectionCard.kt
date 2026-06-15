@@ -69,7 +69,7 @@ fun DiceSelectionCard(
   val returnOffset by
     animateDpAsState(
       targetValue = if (isRecentlyRemoved) (-8).dp else 0.dp,
-      animationSpec = tween(MainMotion.DICE_FEEDBACK_MILLIS),
+      animationSpec = tween(MainMotionTokens.DICE_FEEDBACK_MILLIS),
       label = "DicePoolReturnOffset",
     )
 

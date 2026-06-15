@@ -109,7 +109,7 @@ class MainScreenTest {
   @Test
   fun historyTab_showsStatsSummaryWhenHistoryExists() {
     composeTestRule.setContent {
-      HistoryTabContent(
+      HistoryContent(
         state =
           DiceUiState(
             rollHistory =
@@ -146,7 +146,7 @@ class MainScreenTest {
   @Test
   fun historyTab_hidesStatsSummaryWhenHistoryIsEmpty() {
     composeTestRule.setContent {
-      HistoryTabContent(state = DiceUiState(), onClearHistory = {}, onReroll = {})
+      HistoryContent(state = DiceUiState(), onClearHistory = {}, onReroll = {})
     }
 
     composeTestRule.onNodeWithText("No rolls in this session yet.").assertExists()

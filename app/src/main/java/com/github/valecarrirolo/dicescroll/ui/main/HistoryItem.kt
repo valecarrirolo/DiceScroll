@@ -7,14 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,132 +36,11 @@ import com.github.valecarrirolo.dicescroll.theme.NeonTeal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.roundToInt
 
-@Composable
-fun HistoryTabContent(
-  state: DiceUiState,
-  onClearHistory: () -> Unit,
-  onReroll: (RollResult) -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
-
-  Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(text = "Roll History", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-
-      if (state.rollHistory.isNotEmpty()) {
-        TextButton(onClick = onClearHistory) {
-          Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-          )
-          Spacer(modifier = Modifier.width(4.dp))
-          Text("Clear All")
-        }
-      }
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    if (state.rollHistory.isEmpty()) {
-      Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Text(
-          text = "No rolls in this session yet.",
-          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-          textAlign = TextAlign.Center,
-        )
-      }
-    } else {
-      HistoryStatsSummary(stats = state.rollHistory.toHistoryStats())
-
-      Spacer(modifier = Modifier.height(12.dp))
-
-      LazyColumn(
-        modifier = Modifier.weight(1f).fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        items(state.rollHistory) { roll ->
-          HistoryItem(roll = roll, dateFormat = dateFormat, onReroll = onReroll)
-        }
-      }
-    }
-  }
-}
-
-@Composable
-private fun HistoryStatsSummary(stats: HistoryStats?) {
-  if (stats == null) return
-
-  Card(
-    modifier = Modifier.fillMaxWidth(),
-    colors =
-      CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f)
-      ),
-  ) {
-    Column(
-      modifier = Modifier.fillMaxWidth().padding(14.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        HistoryStatCell(
-          label = "Rolls",
-          value = "${stats.rollCount}",
-          modifier = Modifier.weight(1f),
-        )
-        HistoryStatCell(
-          label = "Dice",
-          value = "${stats.diceRolled}",
-          modifier = Modifier.weight(1f),
-        )
-      }
-
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        HistoryStatCell(
-          label = "Avg",
-          value = stats.averageTotal.asStatValue(),
-          modifier = Modifier.weight(1f),
-        )
-        HistoryStatCell(label = "Min", value = "${stats.minTotal}", modifier = Modifier.weight(1f))
-        HistoryStatCell(label = "Max", value = "${stats.maxTotal}", modifier = Modifier.weight(1f))
-      }
-    }
-  }
-}
-
-@Composable
-private fun HistoryStatCell(label: String, value: String, modifier: Modifier = Modifier) {
-  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-    Text(
-      text = label,
-      fontSize = 11.sp,
-      color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.48f),
-    )
-    Text(
-      text = value,
-      fontWeight = FontWeight.Black,
-      fontSize = 18.sp,
-      fontFamily = FontFamily.Monospace,
-      color = NeonTeal,
-    )
-  }
-}
-
-private fun Double.asStatValue(): String {
-  val rounded = roundToInt()
-  return if (this == rounded.toDouble()) {
-    "$rounded"
-  } else {
-    String.format(Locale.US, "%.1f", this)
-  }
-}
+private val HistoryItemPadding = 14.dp
+private val HistoryItemContentGap = 10.dp
+private val HistoryItemSetupGap = 3.dp
+private val HistoryRerollIconSize = 14.dp
 
 @Preview(showBackground = true, name = "History Item")
 @Composable
@@ -211,15 +86,18 @@ fun HistoryItem(
       ),
   ) {
     Column(
-      modifier = Modifier.fillMaxWidth().padding(14.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
+      modifier = Modifier.fillMaxWidth().padding(HistoryItemPadding),
+      verticalArrangement = Arrangement.spacedBy(HistoryItemContentGap),
     ) {
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top,
       ) {
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Column(
+          modifier = Modifier.weight(1f),
+          verticalArrangement = Arrangement.spacedBy(HistoryItemSetupGap),
+        ) {
           Text(text = diceSummary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
           Text(
             text = "Setup",
@@ -237,12 +115,7 @@ fun HistoryItem(
 
       val rollsDetail = remember(roll.rolls) { roll.rolls.map { it.value }.joinToString(", ") }
       Text(
-        text =
-          if (roll.modifier == 0) {
-            "Values: $rollsDetail"
-          } else {
-            "Values: $rollsDetail   Modifier: ${if (roll.modifier > 0) "+" else ""}${roll.modifier}"
-          },
+        text = roll.valuesDescription(rollsDetail),
         fontSize = 12.sp,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.68f),
       )
@@ -274,7 +147,7 @@ fun HistoryItem(
           Icon(
             imageVector = Icons.Default.Refresh,
             contentDescription = null,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(HistoryRerollIconSize),
           )
           Spacer(modifier = Modifier.width(4.dp))
           Text("Reroll", fontSize = 12.sp)
@@ -283,3 +156,10 @@ fun HistoryItem(
     }
   }
 }
+
+private fun RollResult.valuesDescription(rollsDetail: String): String =
+  if (modifier == 0) {
+    "Values: $rollsDetail"
+  } else {
+    "Values: $rollsDetail   Modifier: ${if (modifier > 0) "+" else ""}$modifier"
+  }

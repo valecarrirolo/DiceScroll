@@ -27,6 +27,19 @@ private val DicePoolGap = 8.dp
 private val DicePoolBottomPadding = 8.dp
 private val DicePoolTitleGap = 6.dp
 
+@ThemePreviews
+@Composable
+fun DicePoolPreview() {
+  ThemedPreview {
+    DicePool(
+      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
+      recentlyAddedDie = null,
+      recentlyRemovedDie = null,
+      onAddDie = {},
+    )
+  }
+}
+
 @Composable
 internal fun DicePool(
   state: DiceUiState,
@@ -67,18 +80,5 @@ internal fun DicePool(
         )
       }
     }
-  }
-}
-
-@ThemePreviews
-@Composable
-fun DicePoolPreview() {
-  ThemedPreview {
-    DicePool(
-      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
-      recentlyAddedDie = null,
-      recentlyRemovedDie = null,
-      onAddDie = {},
-    )
   }
 }

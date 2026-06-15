@@ -1,3 +1,9 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.core.animateDpAsState
@@ -18,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +59,6 @@ private val TopBarLogoSize = 32.dp
 private val TopBarLogoRadius = 8.dp
 private val TopBarTitleGap = 10.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainTopBar(onClearTray: () -> Unit) {
   TopAppBar(

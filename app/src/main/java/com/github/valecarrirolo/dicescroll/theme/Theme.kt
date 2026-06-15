@@ -1,15 +1,28 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.theme
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 
 private val DarkColorScheme =
   darkColorScheme(
@@ -48,7 +61,7 @@ fun DiceScrollTheme(
 ) {
   val colorScheme =
     when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+      dynamicColor && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) -> {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       }
@@ -57,4 +70,22 @@ fun DiceScrollTheme(
     }
 
   MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+}
+
+@Composable
+fun ThemedPreview(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+  DiceScrollTheme { Surface { Column(modifier, content = content) } }
+}
+
+@Preview(name = "Light Mode")
+@Preview(
+  name = "Dark Mode",
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class ThemePreviews
+
+@ThemePreviews
+@Composable
+private fun TestPreview() {
+  ThemedPreview { Text("Hello ThemedPreview! 😁") }
 }

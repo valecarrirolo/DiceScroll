@@ -1,3 +1,9 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.AnimatedContent
@@ -43,21 +49,21 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
-import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
 data class TrayDieInstance(val key: String, val type: DiceType?, val value: Int)
 
-@Preview(showBackground = true, name = "Tray Content Preview")
+@ThemePreviews
 @Composable
 fun TrayContentPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).size(300.dp)) {
       TrayContent(
         state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2, DiceType.D20 to 1)),
@@ -173,10 +179,10 @@ fun TrayContent(state: DiceUiState, highlightedDie: DiceType?, onRemoveDie: (Dic
   }
 }
 
-@Preview(name = "Die Item D20")
+@ThemePreviews
 @Composable
 fun DieItemPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.padding(16.dp)) {
       DieItem(type = DiceType.D20, value = 18, isRolling = false)
     }

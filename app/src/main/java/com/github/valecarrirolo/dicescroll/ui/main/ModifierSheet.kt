@@ -1,3 +1,9 @@
+@file:OptIn(
+  ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.foundation.background
@@ -76,7 +82,6 @@ fun ModifierChip(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModifierControlsSheet(
   modifierValue: Int,

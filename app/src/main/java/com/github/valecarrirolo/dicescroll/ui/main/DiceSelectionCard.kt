@@ -1,3 +1,9 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.animation.core.Spring
@@ -27,18 +33,18 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
-import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
-@Preview(name = "Dice Selection Card")
+@ThemePreviews
 @Composable
 fun DiceSelectionCardPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.padding(16.dp)) {
       DiceSelectionCard(type = DiceType.D8, count = 2, onAdd = {})
     }

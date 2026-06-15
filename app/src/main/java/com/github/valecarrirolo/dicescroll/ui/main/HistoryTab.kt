@@ -1,3 +1,9 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.foundation.background
@@ -29,14 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 import com.github.valecarrirolo.dicescroll.data.model.SingleDieRoll
-import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -167,10 +173,10 @@ private fun Double.asStatValue(): String {
   }
 }
 
-@Preview(showBackground = true, name = "History Item")
+@ThemePreviews
 @Composable
 fun HistoryItemPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.padding(16.dp).background(MaterialTheme.colorScheme.background)) {
       HistoryItem(
         roll =

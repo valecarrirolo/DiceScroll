@@ -1,3 +1,9 @@
+@file:OptIn(
+  androidx.compose.material3.ExperimentalMaterial3Api::class,
+  androidx.compose.foundation.ExperimentalFoundationApi::class,
+  androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
+
 package com.github.valecarrirolo.dicescroll.ui.main
 
 import androidx.compose.foundation.background
@@ -8,12 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
-import com.github.valecarrirolo.dicescroll.theme.DiceScrollTheme
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
 
-@Preview(showBackground = true, name = "Main Screen Light")
+@ThemePreviews
 @Composable
 fun MainScreenContentLightPreview() {
-  DiceScrollTheme(darkTheme = false) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
       MainScreenContent(
         state =
@@ -28,10 +35,10 @@ fun MainScreenContentLightPreview() {
   }
 }
 
-@Preview(showBackground = true, name = "Main Screen Dark")
+@ThemePreviews
 @Composable
 fun MainScreenContentDarkPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
       MainScreenContent(
         state =
@@ -49,10 +56,10 @@ fun MainScreenContentDarkPreview() {
   }
 }
 
-@Preview(showBackground = true, name = "Tray Empty")
+@ThemePreviews
 @Composable
 fun TrayContentEmptyPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background).fillMaxWidth()) {
       MainScreenContent(
         state = DiceUiState(selectedDice = emptyMap()),
@@ -66,10 +73,10 @@ fun TrayContentEmptyPreview() {
   }
 }
 
-@Preview(showBackground = true, name = "Tray Rolling")
+@ThemePreviews
 @Composable
 fun TrayContentRollingPreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
       MainScreenContent(
         state =
@@ -88,10 +95,11 @@ fun TrayContentRollingPreview() {
   }
 }
 
+@ThemePreviews
 @Preview(showBackground = true, name = "Main Screen Landscape", widthDp = 840, heightDp = 420)
 @Composable
 fun MainScreenContentLandscapePreview() {
-  DiceScrollTheme(darkTheme = true) {
+  ThemedPreview {
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
       MainScreenContent(
         state =

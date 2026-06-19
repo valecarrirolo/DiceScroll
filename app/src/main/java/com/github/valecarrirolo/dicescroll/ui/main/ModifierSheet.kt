@@ -38,6 +38,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
+import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
+
+@ThemePreviews
+@Composable
+fun ModifierControlsSheetPreview() {
+  ThemedPreview {
+    ModifierControlsSheet(
+      modifierValue = 2,
+      modifierEnabled = true,
+      onModifierEnabledChange = {},
+      onSetModifier = {},
+      onDismiss = {},
+    )
+  }
+}
 
 @Composable
 fun ModifierControlsSheet(

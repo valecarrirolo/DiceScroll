@@ -1,4 +1,4 @@
-package com.github.valecarrirolo.dicescroll.data
+package com.github.valecarrirolo.dicescroll.data.repository
 
 import android.content.Context
 import androidx.room.Room

@@ -4,7 +4,9 @@
   androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
 )
 
-package com.github.valecarrirolo.dicescroll.ui.main
+package com.github.valecarrirolo.dicescroll.ui.screens.history
+
+import com.github.valecarrirolo.dicescroll.ui.screens.roller.DiceUiState
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

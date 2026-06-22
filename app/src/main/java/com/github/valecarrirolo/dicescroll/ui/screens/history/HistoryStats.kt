@@ -1,4 +1,4 @@
-package com.github.valecarrirolo.dicescroll.ui.main
+package com.github.valecarrirolo.dicescroll.ui.screens.history
 
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
 

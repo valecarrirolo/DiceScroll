@@ -7,7 +7,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.github.valecarrirolo.dicescroll.ui.main.MainScreen
+import com.github.valecarrirolo.dicescroll.ui.screens.roller.MainScreen
 import kotlinx.serialization.Serializable
 
 @Serializable data object Main : NavKey

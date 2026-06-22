@@ -1,18 +1,14 @@
-package com.github.valecarrirolo.dicescroll.ui.main
+package com.github.valecarrirolo.dicescroll.ui.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,57 +26,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.theme.NeonPurple
 import com.github.valecarrirolo.dicescroll.theme.NeonTeal
-import com.github.valecarrirolo.dicescroll.theme.ThemePreviews
-import com.github.valecarrirolo.dicescroll.theme.ThemedPreview
+import com.github.valecarrirolo.dicescroll.ui.theme.MotionTokens
 import kotlinx.coroutines.launch
 
-private val RollControlHeight = 52.dp
-private val RollButtonRadius = 26.dp
-private val RollControlsGap = 10.dp
-
-@ThemePreviews
 @Composable
-fun RollControlsPreview() {
-  ThemedPreview {
-    RollControls(
-      state = DiceUiState(selectedDice = mapOf(DiceType.D6 to 2), modifier = 1),
-      modifierEnabled = true,
-      onModifierClick = {},
-      onRoll = {},
-      modifier = Modifier.padding(16.dp),
-    )
-  }
-}
-
-@Composable
-internal fun RollControls(
-  state: DiceUiState,
-  modifierEnabled: Boolean,
-  onModifierClick: () -> Unit,
+fun RollButton(
+  isRolling: Boolean,
+  totalDiceCount: Int,
   onRoll: () -> Unit,
-  modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier
 ) {
-  Row(
-    modifier = modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.spacedBy(RollControlsGap),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    ModifierChip(
-      modifierValue = state.modifier,
-      modifierEnabled = modifierEnabled,
-      onClick = onModifierClick,
-      modifier = Modifier.height(RollControlHeight),
-    )
-    RollButton(state = state, onRoll = onRoll, modifier = Modifier.weight(1f))
-  }
-}
-
-@Composable
-private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifier = Modifier) {
-  val enabled = state.selectedDice.isNotEmpty() && !state.isRolling
+  val enabled = totalDiceCount > 0 && !isRolling
   val buttonScale = remember { Animatable(1f) }
   val coroutineScope = rememberCoroutineScope()
 
@@ -89,7 +47,7 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
       coroutineScope.launch {
         buttonScale.animateTo(
           0.92f,
-          animationSpec = tween(MainMotionTokens.ROLL_BUTTON_PRESS_MILLIS),
+          animationSpec = tween(MotionTokens.ROLL_BUTTON_PRESS_MILLIS),
         )
         buttonScale.animateTo(
           1f,
@@ -101,9 +59,9 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
     enabled = enabled,
     modifier =
       modifier
-        .height(RollControlHeight)
+        .height(52.dp)
         .scale(buttonScale.value)
-        .clip(RoundedCornerShape(RollButtonRadius)),
+        .clip(RoundedCornerShape(26.dp)),
     colors =
       ButtonDefaults.buttonColors(
         containerColor = Color.Transparent,
@@ -132,8 +90,8 @@ private fun RollButton(state: DiceUiState, onRoll: () -> Unit, modifier: Modifie
       Text(
         text =
           when {
-            state.isRolling -> "ROLLING..."
-            state.totalDiceCount > 0 -> "ROLL ${state.totalDiceCount} DICE"
+            isRolling -> "ROLLING..."
+            totalDiceCount > 0 -> "ROLL $totalDiceCount DICE"
             else -> "SELECT DICE"
           },
         fontSize = 16.sp,

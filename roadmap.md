@@ -23,7 +23,7 @@ The main experience should feel like preparing and rolling dice on a real table:
 * Use motion to explain interactions, not as decoration.
 * Keep implementation changes scoped to the current product surface unless a data-model change is explicitly promoted.
 * Keep Compose entry points thin: screen wiring, layout, controls, previews, and data access should live in focused files.
-* Name UI files by responsibility, not by implementation accident: shell, tabs, tray, pool, controls, history content, history items, and summaries should remain easy to find.
+* The UI is organized into features (`ui/screens/roller`, `ui/screens/history`) and shared elements (`ui/components`). Name UI files by responsibility and avoid flat unstructured directories.
 * Avoid catch-all composable files. Split a file when it starts owning unrelated layout, controls, formatting, and preview code.
 * Keep screen entry points free from previews; store broad previews in preview files and leaf previews beside the component they exercise.
 * Keep repository contracts, Room implementations, and test fakes separated so persistence changes are easy to review.

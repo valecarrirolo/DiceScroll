@@ -1,8 +1,8 @@
-package com.github.valecarrirolo.dicescroll.ui.main
+package com.github.valecarrirolo.dicescroll.ui.screens.roller
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.valecarrirolo.dicescroll.data.DataRepository
+import com.github.valecarrirolo.dicescroll.data.repository.DataRepository
 import com.github.valecarrirolo.dicescroll.data.model.DiceSnapshot
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
@@ -29,7 +29,7 @@ data class DiceUiState(
     get() = selectedDice.values.sum()
 }
 
-class MainScreenViewModel(private val repository: DataRepository) : ViewModel() {
+class RollerViewModel(private val repository: DataRepository) : ViewModel() {
 
   private val _selectedDice = MutableStateFlow<Map<DiceType, Int>>(emptyMap())
   private val _modifier = MutableStateFlow(0)

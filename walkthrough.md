@@ -13,10 +13,12 @@ I have successfully created and configured the **DiceScroll** application. The a
 2. **Core Domain & Data Layer**:
    - [DiceType.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/data/model/DiceType.kt): Created enum defining standard polyhedral dice types (D4, D6, D8, D10, D12, D20, D100) with their custom neon colors.
    - [RollResult.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/data/model/RollResult.kt): Model for roll outcomes, tracking timestamp, modifier, individual values, and total.
-   - [DataRepository.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/data/DataRepository.kt): Implemented reactive `MutableStateFlow` data storage to preserve roll history.
+   - [DataRepository.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/data/repository/DataRepository.kt): Implemented reactive `MutableStateFlow` data storage to preserve roll history.
 
 3. **MVVM Presentation Layer**:
-   - [MainScreenViewModel.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/ui/main/MainScreenViewModel.kt):
+   - Refactored architecture into `ui/components/`, `ui/screens/roller/`, and `ui/screens/history/` for better separation of concerns.
+   - Extracted common UI elements (`DieItem`, `DiceSelectionCard`, `ModifierChip`, `RollButton`) to `ui/components/`.
+   - [RollerViewModel.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/ui/screens/roller/RollerViewModel.kt):
      - Exposes state via unified `DiceUiState` Flow.
      - Implements roll logic with a timed coroutine loop to simulate rolling clatter animations.
      - Supports adding/removing multiple dice to the tray.
@@ -25,7 +27,7 @@ I have successfully created and configured the **DiceScroll** application. The a
 4. **UI styling & Theme**:
    - [Color.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/theme/Color.kt) & [Theme.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/theme/Theme.kt): Implemented a premium custom theme default featuring midnight blues, neon teals, and vibrant purples.
 
-  - [MainScreen.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/ui/main/MainScreen.kt): Custom Compose UI refactored into a stateless `MainScreenContent` and stateful wrapper:
+  - [MainScreen.kt](file:///Users/nemsi/AndroidStudioProjects/DiceScroll/app/src/main/java/com/github/valecarrirolo/dicescroll/ui/screens/roller/MainScreen.kt): Custom Compose UI refactored into a stateless `MainScreenContent` and stateful wrapper:
       - TopAppBar showing clear tray/history triggers.
       - A glassmorphic tray with border gradients.
       - Rolling shake animations on the dice elements.

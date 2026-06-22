@@ -1,4 +1,4 @@
-package com.github.valecarrirolo.dicescroll.data
+package com.github.valecarrirolo.dicescroll.data.repository
 
 import com.github.valecarrirolo.dicescroll.data.model.DiceType
 import com.github.valecarrirolo.dicescroll.data.model.RollResult
